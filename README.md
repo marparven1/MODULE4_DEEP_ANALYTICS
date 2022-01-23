@@ -21,10 +21,10 @@ Indoor locationing: Determining a person’s physical position in a multi-buildi
 Perform visualizations, and then generate descriptive statistics and predictive models using both statistical classifiers and linear regression 
 techniques. 
 
-In this course we will be working on:
+In this course we will work on:
 
-- Defining the business purpose of a data analytics project and make a principled, realistic analysis plan
-- Installing and using the R statistical programming language and R Studio
+- Define the business purpose of a data analytics project and make a principled, realistic analysis plan
+- Install and using the R statistical programming language and R Studio
 - Manage data in R
 - Explore data using visualization techniques and descriptive statistics in R
 - Choose and evaluate classification modeling techniques in R
