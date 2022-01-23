@@ -1,0 +1,228 @@
+---
+title: "Proyecto para los clientes de *IOT Analytics*"
+subtitle: 'Task 1: Domain Research and Exploratory Data Analysis'
+author: "Marta Venegas Pardo"
+date: "1/23/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE , message = FALSE , warning = FALSE)
+```
+
+
+```{r librerias}
+library(dplyr)
+library(tidyverse)
+library(kableExtra)
+library(data.table)
+# Instalación de la librería para conectarnos a la base de datos
+# install.packages("RMySQL")
+library(RMySQL)
+```
+
+
+# Introducción (definición del problema + objetivos)
+
+Un gran desarrollador residencial regional está diseñando un gran desarrollo de viviendas de apartamentos 'Smart Home' y está buscando pruebas o razones positivas para **adoptar el uso de dispositivos de medición eléctrica** utilizados para la administración de energía en Smart Homes.
+
+Estos medidores brindan a los propietarios análisis de uso de energía 'útiles'. Su instalación, haría posible una reducción del consumo de energía y, como resultado, un ahorro monetario (esto es un punto que debo demostrar)
+
+La instalación de estos bmedidores podría ser un gran paso hacia el objetivo del desarrollador de ofrecer hogares inteligentes altamente eficientes que brinden a los propietarios análisis de uso de energía, una gran parte de sus esfuerzos de marketing planificados.
+
+
+
+## Objetivos
+
+Los objetivos del estudio son los siguientes:
+
+- Analizar datos proporcionados para encontrar evidencias para respaldar el proyecto de instalar medidores eléctricos para la administración de energía en Smart Homes.
+- Demostrar que existe la posibilidad de construir buenos modelos para predecir el consumo de energía futuro a partir de los datos. 
+
+
+## Conociendo al cliente
+
+¿Qué papel juegan los submedidores en la industria eléctrica? 
+¿Qué tipos de análisis de uso de energía se ofrecen actualmente? 
+¿Qué se puede aprender de la analítica? 
+¿Cuáles son los beneficios para los consumidores?
+
+## Qué encontraremos en este informe
+
+
+## Procedimiento para cumplir mis objetivos
+
+# Descripción de los conjuntos de datos
+
+
+## Entendiendo mis datos
+
+¿Entiende todos los atributos o necesita investigar un poco para llenar un vacío de conocimiento? 
+¿Cómo se mide la potencia? 
+¿En qué tipo de unidades? 
+¿Qué áreas del hogar mide cada uno de los submedidores? 
+¿Hay información adicional relacionada con la energía y la energía que beneficiaría a los análisis en el futuro si se agregara al conjunto de datos? 
+¿Hay algún cambio en la estructura de recopilación de datos de submedición que ayudaría a los análisis futuros?
+
+Como punto de partida, nos han proporcionado un conjunto de datos muy grande que contiene 47 meses de datos de uso de energía de estos dispositivos. Nuestro trabajo durante las próximas semanas será analizar estos datos para determinar **qué tipo de análisis y visualizaciones se pueden crear** que permitan a los propietarios de hogares inteligentes comprender y controlar mejor su consumo de energía.
+
+
+
+
+Como eres nuevo en IOT Analytics, explicaré nuestro proceso de incorporación para nuevos clientes.
+
+
+Realizar investigaciones para informarse sobre el negocio del cliente. En este caso, deberá ponerse al día en los dominios de Smart Homes, submedidores y consumo de energía del hogar.
+Identifique cualquier brecha de conocimiento/habilidad analítica prevista para el proyecto y rellene esas brechas con el autoaprendizaje. Con un conjunto de datos tan grande, la recopilación y el subconjunto de datos serán esenciales para el proceso analítico. También es necesario dominar el trabajo con DateTime y Time Series.
+
+Realizar una exploración inicial de los datos. Esta exploración debe usarse para comprender cualquier problema potencial, realizar un **preprocesamiento** temprano, anotar **estadísticas de resumen** e identificar cualquier **recomendación temprana** sobre mejoras en la recopilación de datos en el futuro.
+
+
+Celebrar una reunión de lanzamiento del proyecto con el cliente para cerrar el trato. Esta reunión se centrará en una presentación que contiene todos los detalles del proyecto y nuestra exploración inicial de los datos.
+Su tarea inicial es trabajar en el proceso de incorporación y producir una presentación de PowerPoint que se entregará al equipo de administración del desarrollador de viviendas durante la reunión inicial. Este informe les dará confianza en nuestro proceso y los convencerá de que este proyecto es relevante para sus necesidades comerciales.
+
+Es importante recordar que no sabemos qué mostrarán los datos, y tampoco el desarrollador; es su trabajo decirles cómo realizaremos el análisis y lo que es probable que obtengan, así que sea preciso y preciso con sus hallazgos y cualquier recomendación inicial. Sin embargo, tenga en cuenta que presentará su informe a personas de negocios en lugar de personas técnicas.
+
+## Datos desde SQL 
+
+```{r}
+
+# Conexión con la Base de datos
+con = dbConnect(MySQL(), user='deepAnalytics', password='Sqltask1234!', dbname='dataanalytics2018', host='data-analytics-2018.cbrosir2cswx.us-east-1.rds.amazonaws.com')
+```
+
+
+```{r}
+## List the tables contained in the database 
+dbListTables(con) #tenemos 6 tablas
+```
+
+
+```{r}
+## Atributos de una tabla (variables)
+dbListFields(con,'yr_2006')
+```
+
+
+This project centers around visualizations and time series analysis of sub-meters. Given this, the data you should pull for each year should be Date, Time and the 3 sub-meter attributes.
+
+Use the dbGetQuery function to download tables 2006 through 2010 with the specified attributes. When complete, your environment should look similar to the image below.
+
+
+
+```{r}
+## Seleccionamos toda la tabla
+## Hacemos querys
+yr_2006 <- dbGetQuery(con, "SELECT Date, Time, Sub_metering_1 , Sub_metering_2 , Sub_metering_3 FROM  yr_2006")
+yr_2006 %>% head() %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+```
+
+
+Vamos a visualizar el dataset
+
+```{r}
+yr_2006 %>% 
+  str()
+
+yr_2006 %>% 
+  summary()
+
+nrow(yr_2006)
+```
+
+La variables date y Time son de tipo caracter, debemos pasarla a formato DataTime.
+
+
+
+
+```{r}
+yr_2007 <- dbGetQuery(con, "SELECT Date, Time, Sub_metering_1 , Sub_metering_2 , Sub_metering_3 FROM  yr_2007")
+yr_2007 %>%  head() %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+```
+
+
+```{r}
+yr_2008 <- dbGetQuery(con, "SELECT Date, Time, Sub_metering_1 , Sub_metering_2 , Sub_metering_3 FROM  yr_2008")
+yr_2008 %>%  head() %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+```
+
+
+Let’s create a Multi-Year data frame that will serve as the primary data frame for the project. We will use the dplyr package function "bind_rows".
+
+
+
+```{r}
+## Combine tables into one dataframe using dplyr
+newDF <- bind_rows(yr_2006, yr_2007, yr_2008)
+newDF$Date<-newDF$Date %>% as.Date(tryFormats = c("%Y-%m-%d"))
+newDF$Time<-newDF$Time %>% strptime(format='%H:%M:%S')
+# unclass(newDF$Time)$sec
+# unclass(newDF$Time)$min
+# unclass(newDF$Time)$hour
+it <- as.ITime(newDF$Time)
+newDF$Time <- it 
+
+str(newDF)
+newDF %>% head()
+```
+
+
+```{r}
+factor(format(newDF$Date,'%Y')) %>% table() # 
+factor(format(newDF$Date,'%m')) %>% table()
+factor(format(newDF$Date,'%d')) %>% table()
+```
+
+
+```{r}
+# yr_2006
+```
+
+
+
+
+```{r}
+
+```
+
+
+With the example above, create a primary data frame that ONLY includes the data frames that span an entire year.
+
+Use str(), summary(), head() and tail() with your primary data frame. Are the dates in the correct order? If so, you are ready to move on to the next step. 
+
+
+
+## Descripción de variables
+
+
+# Preparación de los datos (Limpieza de datos)
+## Duplicados
+## Transformación de variables
+### Datos ficticios (dummy)
+### Factorización de las variables
+### Normalización de variables
+## Datos faltantes
+## Outliers
+## Creación de variables
+
+# Análisis exploratorio
+## Tipos de productos a la venta en Blackwell
+## Resumen de los datos
+## Correlación
+## Varianza de las variables dummy
+## Representaciones gráficas
+
+
+
+
+# Conclusiones y recomendaciones
+## Aspectos destacables
+## Métodos utilizados para modelar (resultados/métricas obtenidas)
+## Predicciones
+
+
+
+
+
+
+
