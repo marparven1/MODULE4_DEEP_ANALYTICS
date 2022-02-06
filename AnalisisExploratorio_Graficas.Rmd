@@ -1,6 +1,7 @@
 ---
 title: "Analisis exploratorio. Graficas"
-subtitle: "IOT Analytics \n Marta Venegas Pardo"
+subtitle: "IOT Analytics"
+author: "Marta Venegas Pardo"
 date: "2/6/2022"
 output: 
   rmdformats::readthedown:
@@ -60,68 +61,91 @@ load(file="Datos/DF_Energia_GMensual.RData")
 
 # Análisis exploratorio
 
+En este apartado veremos un análisis profundo del consumo energético, además añadiremos gráficas que nos muestren el comportamiento del consumidor.
+
+Trataremos de responder a las siguientes preguntas:
+
+* ¿Cuáles son los patrones típicos de uso de energía para cada submedidor?
+* ¿Son ciertos estos patrones "típicos" para el período de tiempo en cuestión? De no ser así, ¿qué se puede usar, si es que se puede usar algo, para ayudar a respaldar el uso de submedidores?
+* ¿Hay alguna recomendación para las preguntas que deberíamos estar haciendo?
+
 ## Resumen de los datos
 
 ```{r}
 summary(DatosCompletos[,9:13])
 ```
 
+Consumo energético medio por minuto (Wh):
+
+- Submedidor 1: 1.11 Wh
+- Submedidor 2: 1.28
+- Submedidor 3: 6.417
+- Energía global: 18.103
+- Energía total sin submedidores: 9.287
+
+
+
+
+El submedidor 3, correspondiente al termo eléctrico y el aire acondicionado, es el que más energía está consumiendo de todos, con una media de 6.41 Wh.
+Po el contrario, los submedidores 1 y 2 han recogido un consumo de energía similar, aunque el submedidor 1, que corresponde a la cocina (lavavajillas, horno y microondas), 1.172 Wh consume un poco menos que el que está en el lavadero (con la secadora, lavadora, el frigorífico y la luz) 1.28 Wh.
+
+Sin embargo, vemos como los submedidores 1 y 2, registran su máximo de consumo en 88 y 80 Wh respectivamente, y el submedidor que más consume de media, que es el 3, registra su máximo en 31 Wh de energía.
+
+Es decir, hay momentos en los que los submedidores 2 y 3 están consumiendo gran cantidad de energía, por ejemplo, el tiempo en que se encuentra funcionando la lavadora, o el lavavajillas y la mayoría del tiempo están apagados sin consumir nada de energía. Esto hace que en media, consuman mucho menos. Sin embargo, los dispositivos correspondientes al submedidor 3, consumen menos energía pero su consumo cuando se usan hace que la media sea bastante superior.
+
+
 
 ```{r}
-(sm1<-(1.172*100)/(18.517) ) # SBM 1
-(sm2<-(1.462*100)/(18.517) ) # SBM 2
-(sm3<-(5.945*100)/(18.517) ) # SBM 3
-sum(sm1,sm2,sm3)
-100-46.3304
+DatosCompletos[which.min(DatosCompletos$energia2),-c(1:8)]
 ```
 
 
-El submetering3, que es el correspondiente al termo eléctrico y el aire acondicionado, es el que más energía está consumiendo de todos, con una media de 5.94 Wh.
-Po el contrario, el submetering 2 y 3 consumen una energía similar, aunque el submetering 1, que corresponde a la cocina (lavavajillas, horno y microondas), 1.172 Wh consume un poco más que el que está en el lavadero (con la secadora, lavadora, el frigorífico y la luz) 1.46 Wh.
-
-Sin embargo, vemos como los submeterings 1 y 2, tienen su máximo en 80 y 70 respectivamente, y el submetering que más consume de media, tiene su máximo en 31 Wh de energía.
-
-Es decir, hay momentos en los que los submeterings 2 y 3 están consumiendo gran cantidad de energía, por ejemplo, el tiempo en que se encuentra funcionando la lavadora, o el lavavajillas y la mayoría del tiempo están apagados sin consumir nada de energía. Esto hace que en media, consuman mucho menos. Sin embargo, los dispositivos correspondientes al submetering 3, consumen menos energía pero al usarse más veces, hace que el consumo medio sea superiror al resto.
 
 
 
 ## Representaciones gráficas
 
-### Gráfico 1. Granularidad
+### Gráfico Granularidad
 
 Debemos ajustar la granularidad de los datos para aprovechar al máximo la información que nos proporcionan los submeterings. 
-Los datos han sido recogidos una vez cada minuto durante 4 años. 
-
+Los datos han sido recogidos una vez cada minuto durante 4 años, lo que hace que tengamos un total de `r nrow(DatosCompletos)` mediciones de energía, lo que hace que para mostrar la información que queremos, tengamos que utilizar diferentes granularidades.
 
 ```{r}
 ## Plot all of sub-meter 1
-# plot(newDF$Sub_metering_1)
+# plot(DatosCompletos$Sub_metering_1)
 # La granularidad de minutos hace que se representen muchos puntos y que no podamos extraer información útil
 ```
-Vamos a representar la segunda semana del año 2008
+Vamos a representar gráficamente el consumo energético por minuto del submedidor 1, correspondiente a la cocina. Repreentaremos los datos de la segunda semana del año 2008.
 
 
 ```{r}
 ## Subset the second week of 2008 - All Observations
 houseWeek <- filter(DatosCompletos, year == 2008 & week == 2)
 ## Plot subset houseWeek
-plot(houseWeek$Sub_metering_2)
-
+plot(houseWeek$Sub_metering_1)
 ```
-Aún tenemos demasiados datos, la granularidad se debería reducir.
+Aún tenemos demasiados datos y no podemos extraer demasiada información, la granularidad se debería reducir.
+
+### Gráfico 1. Energía correspondiente a un único día
+
+
+
 
 ```{r}
 ## Subset the 9th day of January 2008 - All observations
 houseDay <- filter(DatosCompletos, year == 2008 & month == 1 & day == 9)
 ## Plot sub-meter 1
-plot_ly(houseDay,
-        x = ~houseDay$DateTime,
-        y = ~houseDay$Sub_metering_1, 
-        type = 'scatter', mode = 'lines')
+# plot_ly(houseDay,
+#         x = ~houseDay$DateTime,
+#         y = ~houseDay$Sub_metering_1, 
+#         type = 'scatter', mode = 'lines')
+
+# Vemos que el submetering 1, que corresponde a la cocina, ha registrado un consumo de # energía mayor en las franjas horarias de 17:15-17:45 y de 18:15-18:30.
+
 ```
 
-Vemos que el submetering 1, que corresponde a la cocina, ha registrado un consumo de energía mayor en las franjas horarias de 17:15-17:45 y de 18:15-18:30.
 
+Vamos a representar el consumo energético de los submedidores el día 9 de Enero del año 2008.
 
 ```{r}
 ## Plot sub-meter 1, 2 and 3 with title, legend and labels - All observations 
@@ -136,9 +160,9 @@ plot_ly(houseDay,
  yaxis = list (title = "Power (watt-hours)"))
 ```
 
-Comparación de la energía registrada por los tres submeterings.
 
-Vamos a reducir la granularidad mostrando una única observación cada 10 minutos
+
+Queremos hacer una comparación de la energía registrada por los tres submeterings, pero para ello, vamos a reducir la granularidad mostrando una única observación cada 10 minutos
 
 
 
@@ -186,27 +210,150 @@ plot_ly(houseDay10,
     
 ### Gráfico 2. Gráfica semanal
 
-Gráfico del consumo medio semanal.
+Gráfico del consumo energético medio semanal.
 
-Media de todas las semanas 52 y 1 de los años anteriores y de estas dos semanas del último año.
+Comparación del consumo energético medio diario del año 2009 y del resto de años. Así veremos si en el último año, el consumo medio diario sigue la misma tendencia que los años anteriores.
 
 
 ```{r}
-## Subset the 9th day of January 2008 - 10 Minute frequency
-houseDay10 <- filter(Granularidad_horas, year == 2009 & week == 3 )
+Media09<-filter(Granularidad_dias, year == 2009  ) %>% group_by(weekday) %>% 
+  summarize ( 
+    Sub_metering_1 = mean(Sub_metering_1),
+    Sub_metering_2 = mean(Sub_metering_2),
+    Sub_metering_3 = mean(Sub_metering_3)
+    )
 
 
-plot_ly(houseDay10, 
-        x = ~houseDay10$DateTime,
-        y = ~houseDay10$Sub_metering_1,
-        name = 'Kitchen', type = 'scatter', mode = 'lines') %>%
- add_trace(y = ~houseDay10$Sub_metering_2, name = 'Laundry Room', mode = 'lines') %>%
- add_trace(y = ~houseDay10$Sub_metering_3, name = 'Water Heater & AC', mode = 'lines') %>%
- layout(title = "Power Consumption 3rd week, 2009",
- xaxis = list(title = "Time"),
- yaxis = list (title = "Power (watt-hours)"))
+EnergiaMedia<-filter(Granularidad_dias, year != 2009  ) %>% group_by(weekday) %>% 
+  summarize ( 
+    Sub_metering_1 = mean(Sub_metering_1),
+    Sub_metering_2 = mean(Sub_metering_2),
+    Sub_metering_3 = mean(Sub_metering_3)
+    )
+plot_ly(EnergiaMedia, 
+        x = ~EnergiaMedia$weekday,
+        y = ~EnergiaMedia$Sub_metering_1,
+        name = 'Cocina',  type = 'bar') %>% 
+   add_trace(x~Media09$weekday,
+             y = ~Media09$Sub_metering_1,
+             name = "Cocina" , line=list(color='blue'), 
+             type = 'scatter', 
+             mode = 'lines+markers',marker = list(
+                 color = "blue"
+               )) %>% 
+    add_trace(x~EnergiaMedia$weekday,
+             y = ~EnergiaMedia$Sub_metering_2,
+             name = "Lavadero" ,
+             type = 'bar') %>% 
+     add_trace(x~Media09$weekday,
+             y = ~Media09$Sub_metering_2,
+             name = "Lavadero" , line=list(color='green'), 
+             type = 'scatter',
+             mode = 'lines+markers',marker = list(
+                 color = "green"
+               )) %>% 
+      add_trace(x~EnergiaMedia$weekday,
+             y = ~EnergiaMedia$Sub_metering_3,
+             name = 'Termo y AC' ,
+             type = 'bar') %>% 
+     add_trace(x~Media09$weekday,
+             y = ~Media09$Sub_metering_3,
+             name = 'Termo y AC' ,line=list(color='blueviolet'), 
+             type = 'scatter', 
+             mode = 'lines+markers',marker = list(
+                 color = "blueviolet"
+               )) %>% 
+  layout(title = "Comparación del consumo energético semanal medio \n Año 2009 vs años 2006-2008",
+ xaxis = list(title = "Día de la semana", 
+              ticktext=list("Lunes", "Martes", "Miércoles", "Jueves","Viernes","Sábado","Domingo"),
+               tickvals=list(1,2,3,4,5,6,7)),
+ yaxis = list (title = "Energía media (Vatios-hora)")
+ )
 ```
-Se trata del consumo energético medio de cada hora.
+
+
+
+
+
+
+A continuación vamos a ver un gráfico 
+s+dfsgd
+sg
+
+
+```{r}
+UltimaSemana09<- filter(Granularidad_dias, year == 2009 & week == 52 )
+# Consumo total medio según dia.
+UltimaSemana09_OtrosAños <- filter(Granularidad_dias, year != 2009 & week == 52 ) %>% 
+  group_by(weekday) %>% 
+  summarize ( 
+    Sub_metering_1 = mean(Sub_metering_1),
+    Sub_metering_2 = mean(Sub_metering_2),
+    Sub_metering_3 = mean(Sub_metering_3)
+    )
+plot_ly(     UltimaSemana09, 
+        x = ~UltimaSemana09$Date,
+        y = ~UltimaSemana09$Sub_metering_1,
+        name = 'Cocina', 
+        type = 'scatter', mode = 'lines+markers') %>%
+ add_trace(y = ~UltimaSemana09$Sub_metering_2, name = 'Lavadero',
+          line=list(color='rgb(254, 237, 108)'),
+          marker = list(color =   'rgb(243, 221, 63  )'),
+           mode = 'lines+markers') %>%
+ add_trace(y = ~UltimaSemana09$Sub_metering_3,
+           name = 'Termo y AC', 
+           line=list(color='rgb(150, 218, 108)'), 
+           marker = list(color = 'rgb(150, 218, 108)'),
+           mode = 'lines+markers') %>%
+ add_trace(x~UltimaSemana09_OtrosAños$weekday,
+             y = ~UltimaSemana09_OtrosAños$Sub_metering_1,
+             name = 'Cocina' , marker = list(color = 'rgb(63, 148, 210)'),
+             type = 'bar') %>% 
+   add_trace(x~UltimaSemana09_OtrosAños$weekday,
+             y = ~UltimaSemana09_OtrosAños$Sub_metering_2,
+             name = 'Lavadero' ,   marker = list(color = 'rgb(254, 237, 108)'),
+             type = 'bar') %>% 
+     add_trace(x~UltimaSemana09_OtrosAños$weekday,
+             y = ~UltimaSemana09_OtrosAños$Sub_metering_3,
+             name = 'Termo y AC' ,   marker = list(color = 'rgb(150, 218, 108)'),
+             type = 'bar') %>% 
+
+ layout(title = "Comparación del consumo energético semanal \n Año 2009 vs Años 2006-2008",
+ xaxis = list(title = "Día de la semana", 
+              ticktext=list("24",
+                            "25", 
+                            "26", 
+                            "27",
+                            "28",
+                            "29",
+                            "30"),
+               tickvals=list(
+                              "2009-12-24" ,
+                              "2009-12-25",
+                              "2009-12-26" ,
+                              "2009-12-27",
+                              "2009-12-28" ,
+                              "2009-12-29",
+                              "2009-12-30")
+              ),
+ yaxis = list (title = "Energía (Vatios-Hora)"))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -397,9 +544,9 @@ Lunes entre las 00 y las 6 am. Submetering 2
 
 
 ```{r}
-Lunes25EneroInvierno <- filter(DatosCompletos, year==2009 & month==1 & day==19 & (hour==0 | hour==2 | hour==3 | hour==4 | hour == 5 | hour ==6)   )
+Lunes25EneroInvierno <- filter(Granularidad_dias, year==2009 & month==1 & day==19   )
 plot_ly(Lunes25EneroInvierno,
-        x = ~Lunes25EneroInvierno$DateTime,
+        x = ~Lunes25EneroInvierno$Date,
         y = ~Lunes25EneroInvierno$Sub_metering_3,
         name = 'Kitchen', type = 'scatter', mode = 'lines') %>% 
  add_trace(y = ~Lunes25EneroInvierno$Sub_metering_2, name = 'Laundry Room', mode = 'lines') %>%
@@ -414,9 +561,9 @@ A la 1 AM el submetering 3 deja de recoger consumo de energía.
 ### Gráfico Fin de Semana y entre semana
 
 ```{r}
-FinDeSemana <- filter(DatosCompletos, year==2009 & (weekday == 6 | weekday == 7) &  month==1 & (minute == 0  | minute == 20 |  minute == 40 | minute == 50)  )
+FinDeSemana <- filter(Granularidad_dias, year==2009 & (weekday == 6 | weekday == 7)   )
 plot_ly(FinDeSemana,
-        x = ~FinDeSemana$DateTime,
+        x = ~FinDeSemana$Date,
         y = ~FinDeSemana$Sub_metering_3,
         name = 'Kitchen', type = 'scatter', mode = 'lines') %>% 
  add_trace(y = ~FinDeSemana$Sub_metering_2, name = 'Laundry Room', mode = 'lines') %>%
@@ -428,13 +575,13 @@ plot_ly(FinDeSemana,
 ```
 
 ```{r}
-EntreSemana <- filter(DatosCompletos, year==2009 & (weekday == 1 | weekday == 2 | weekday == 3 | weekday == 4 | weekday == 5 ) &  month==1 & (minute == 0  | minute == 20 |  minute == 40 | minute == 50)  )
+EntreSemana <- filter(DatosCompletos, year==2009 & (weekday == 1 | weekday == 2 | weekday == 3 | weekday == 4 | weekday == 5 ) &  month==1   )
 plot_ly(EntreSemana,
-        x = ~FinDeSemana$DateTime,
-        y = ~FinDeSemana$Sub_metering_3,
+        x = ~EntreSemana$DateTime,
+        y = ~EntreSemana$Sub_metering_3,
         name = 'Kitchen', type = 'scatter', mode = 'lines') %>% 
- add_trace(y = ~FinDeSemana$Sub_metering_2, name = 'Laundry Room', mode = 'lines') %>%
- add_trace(y = ~FinDeSemana$Sub_metering_3, name = 'Water Heater & AC', mode = 'lines') %>%
+ add_trace(y = ~EntreSemana$Sub_metering_2, name = 'Laundry Room', mode = 'lines') %>%
+ add_trace(y = ~EntreSemana$Sub_metering_3, name = 'Water Heater & AC', mode = 'lines') %>%
 #  add_trace(y = ~LunesInvierno$Global_active_power, name = 'GlobalActivePower', mode = 'lines') # %>%
  layout(title = "Consumo de energía entre semana de Enero, año 2009",
  xaxis = list(title = "Time"),
@@ -442,15 +589,19 @@ plot_ly(EntreSemana,
 ```
 
 
+
+
+
+
 ### Gráficos opcionales
 
 
 ```{r}
-energiaTotal<-sum(Datos3$Global_active_power)
-sm1<-sum(Datos3$Sub_metering_1)
-sm2<-sum(Datos3$Sub_metering_2)
-sm3<-sum(Datos3$Sub_metering_3)
-en2<-sum(Datos3$energia2)
+energiaTotal<-sum(DatosCompletos$Global_active_power)
+sm1<-sum(DatosCompletos$Sub_metering_1)
+sm2<-sum(DatosCompletos$Sub_metering_2)
+sm3<-sum(DatosCompletos$Sub_metering_3)
+en2<-sum(DatosCompletos$energia2)
 
 count.data <- data.frame(
   class = c("Sub_metering_1","Sub_metering_2","Sub_metering_3","EnergiaNoSubmeterizada"),
@@ -515,7 +666,7 @@ Percentage of total power use over a day by each sub-meter.
 
 ```{r}
 Gda<-Granularidad_dias %>% filter(year== 2009 & day==1 & month==1 ) %>% gather()
-data<-Gda[c(6,7,8,10),]
+data<-Gda[c(6,7,8,9),]
 #colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)', 'rgb(114,147,203)')
 
 fig <- plot_ly(data, labels = ~key, values = ~value, type = 'pie',
@@ -537,8 +688,62 @@ Percentage of total power use over an entire year by each sub-meter.
 
 
 ```{r}
+PorcAnual<-Granularidad_meses %>% group_by(year) %>% 
+   summarize(
+    Sub_metering_1=sum(Sub_metering_1),
+    Sub_metering_2=sum(Sub_metering_2),
+    Sub_metering_3=sum(Sub_metering_3),
+    energia2=sum(energia2)
+  )
+
+Anual6<-PorcAnual[1,-1] %>% gather()
+```
+
+
+```{r}
+fig06 <- plot_ly(Anual6, labels = ~key, values = ~value, type = 'pie',
+        textposition = 'inside',
+        textinfo = 'label+percent',
+        hoverinfo = 'text',showlegend = FALSE
+       # ,marker = list(colors = colors,line = list(color = '#FFFFFF', width = 1))
+        )
+fig06 <- fig06 %>% layout(title = 'Consumo energético. Año 2006',
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+fig06
+
+Anual7<-PorcAnual[2,-1] %>% gather()
+Anual8<-PorcAnual[3,-1] %>% gather()
+Anual9<-PorcAnual[4,-1] %>% gather()
+Anual10<-PorcAnual[5,-1] %>% gather()
+
+fig <- plot_ly()
+fig <- fig %>% add_pie(data = Anual7, labels = ~key, values = ~value,
+                       title = 'Año 2007',
+                         name = "Cut", domain = list(row = 0, column = 0))
+fig <- fig %>% add_pie(data = Anual8, labels = ~key, values = ~value, title = 'Año 2008',
+                       name = "Color", domain = list(row = 0, column = 1))
+fig <- fig %>% add_pie(data = Anual9, ~key, values = ~value, title = 'Año 2009',
+                       name = "Clarity", domain = list(row = 1, column = 0))
+fig <- fig %>% add_pie(data = Anual10, ~key, values = ~value, title = 'Año 2010',
+                       name = "Clarity", domain = list(row = 1, column = 1))
+fig <- fig %>% layout(title = 'Porcentaje del total de consumo energético', showlegend = T,
+                      grid=list(rows=2, columns=2),
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+fig
+
 
 ```
+
+
+
+
+
+
+
+
 
 
 

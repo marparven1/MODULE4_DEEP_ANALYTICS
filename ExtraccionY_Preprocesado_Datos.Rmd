@@ -260,31 +260,7 @@ str(Datos2)
 ```{r}
 # Creo un dataset donde elimino la variable Time y Date
 Datos3 <- Datos2 %>% select(-c(2,3))
-
 ```
-
-### Extracción de la fecha con Lubridate
-
-
-En este apartado nos disponemos a extraer toda la información correspondiente año, mez, día, día de la semana, semana del año correspondiente, hora y minuto de todos los registros.
-
-Obtenemos una tabla de la siguiente forma:
-
-```{r}
-Datos3$year <- year(Datos3$DateTime) # extraemos el año
-Datos3$month<- month(Datos3$DateTime) # extraemos el mes
-Datos3$day<-day(Datos3$DateTime) # extraemos el día
-Datos3$hour<-hour(Datos3$DateTime) # extraemos la hora
-Datos3$minute<- minute(Datos3$DateTime) # extraemos el minuto
-Datos3$week<-week(Datos3$DateTime)
-Datos3$weekday<-wday(Datos3$DateTime,week_start = 1 )
-## ORDENAMOS LAS COLUMNAS
-Datos3 <- Datos3[,c(6,7,8,12,9,10,11,1,2,3,4,5)]
-
-DT::datatable(  head(Datos3,1000)  )
-```
-
-
 
 
 ### Creamos una nueva variable (Energia2)
@@ -300,7 +276,7 @@ Energía activa consumida en el hogar por equipos eléctricos que no han sido me
 
 Datos2$energia2<-
 (Datos2$Global_active_power*1000/60 - Datos2$Sub_metering_1 - Datos2$Sub_metering_2 - Datos2$Sub_metering_3)
-Datos3$energia2<-Datos2$energia2
+Datos3$energia2<-Datos3$Global_active_power*1000/60 - Datos3$Sub_metering_1 - Datos3$Sub_metering_2 - Datos3$Sub_metering_3
 ```
 
 
@@ -329,6 +305,35 @@ Datos3$Global_active_power<-Datos3$Global_active_power*1000/60
 
 
 
+
+
+
+### Extracción de la fecha con Lubridate
+
+
+En este apartado nos disponemos a extraer toda la información correspondiente año, mez, día, día de la semana, semana del año correspondiente, hora y minuto de todos los registros.
+
+Obtenemos una tabla de la siguiente forma:
+
+```{r}
+Datos3$year <- year(Datos3$DateTime) # extraemos el año
+Datos3$month<- month(Datos3$DateTime) # extraemos el mes
+Datos3$day<-day(Datos3$DateTime) # extraemos el día
+Datos3$hour<-hour(Datos3$DateTime) # extraemos la hora
+Datos3$minute<- minute(Datos3$DateTime) # extraemos el minuto
+Datos3$week<-week(Datos3$DateTime)
+Datos3$weekday<-wday(Datos3$DateTime,week_start = 1 )
+## ORDENAMOS LAS COLUMNAS
+Datos3 <- Datos3[,c(6,7,8,12,9,10,11,1,2,3,4,5)]
+
+# DT::datatable(  head(Datos3,1000)  )
+```
+
+
+
+
+
+
 ## Datos faltantes
 
 
@@ -340,7 +345,8 @@ FechasCompletas  <- data.frame(DateTime = FechasCompletas )
 # Hacemos Merge al conjunto de datos completo y al Datos3 para añadir NA a aquellos valores faltantes
 DatosCompletos <- merge(FechasCompletas, Datos3, by = "DateTime", all.x = TRUE)
 ### Find missing values in my complete data
-DatosCompletos<- DatosCompletos [,c(1,9,10,11,12,13)]
+
+DatosCompletos<- DatosCompletos[,c(1,9,10,11,12,2)]
 Miss_values <- which(is.na(DatosCompletos$Sub_metering_1) == TRUE)
 ```
 
@@ -394,7 +400,9 @@ DatosCompletos<- DatosCompletos[,c(1,7,8,9,10,11,12,13,2,3,4,5,6)]
 
 Para la correcta visualización y exploración de los datos vamos a extraer distintos conjuntos de datos con granularidad de horas, días y meses.
 
+
 ### Horas
+
 
 
 ```{r}
@@ -482,12 +490,6 @@ DT::datatable(Granularidad_dias, class = "cell-border stripe")
 ```
 
 
-
-
-
-
-
-
 ### Meses
 
 Para este conjunto de datos, tenemos una única medición del consumo energético mensual, que es la suma de todas las mediciones de ese mes. Para poder tener los datos en el formato adecuado, se ha considerado que todas las mediciones corresponden al día 1 de cada mes, pero en realidad es la suma de todas las de ese mes.
@@ -523,6 +525,13 @@ attr(Granularidad_meses$`Date-MY` , "tzone") <- "Europe/Paris"
 
 ```{r}
 DT::datatable(Granularidad_meses, class = 'cell-border stripe')
+```
+
+
+### Minutos
+
+```{r}
+DT::datatable(head(DatosCompletos,1500) , class = 'cell-border stripe')
 ```
 
 
