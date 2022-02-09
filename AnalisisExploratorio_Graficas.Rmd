@@ -129,8 +129,6 @@ Aún tenemos demasiados datos y no podemos extraer demasiada información, la gr
 ### Gráfico 1. Energía correspondiente a un único día
 
 
-
-
 ```{r}
 ## Subset the 9th day of January 2008 - All observations
 houseDay <- filter(DatosCompletos, year == 2008 & month == 1 & day == 9)
@@ -149,6 +147,7 @@ Vamos a representar el consumo energético de los submedidores el día 9 de Ener
 
 ```{r}
 ## Plot sub-meter 1, 2 and 3 with title, legend and labels - All observations 
+
 plot_ly(houseDay,
         x = ~houseDay$DateTime,
         y = ~houseDay$Sub_metering_1,
@@ -649,19 +648,9 @@ graf10<-plot_ly(x=~Mensual10$`Date-MY`,type = 'scatter') %>%
            marker = list(color ='rgb(150, 218, 108)')) %>%
  layout(
  xaxis = list(title = "2010",
-              ticktext=list("2010"),
-               tickvals=list("2010-01" ,
-                             "2010-02"  ,
-                             "2010-03" ,
-                             "2010-04" ,
-                             "2010-05"  ,
-                             "2010-06",
-                             "2010-07" ,
-                             "2010-08"  ,
-                             "2010-09",
-                             "2010-10" ,
-                             "2010-11"  ,
-                             "2010-12" )
+ticktext = list("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"), 
+                          tickvals = list("2010-01", "2010-02", "2010-03", "2010-04", "2010-05", "2010-06", "2010-07", "2010-08", "2010-09", "2010-10", "2010-11", "2010-12")
+                          
               )
  # yaxis = list (title = "Energía (Varios-hora)")
  )
@@ -671,6 +660,10 @@ fig <- subplot(graf07, graf08, graf09, graf10, nrows = 2) %>%
   layout( title = 'Evolución del consumo energético mensual, años 2007-2010'
         )
 fig
+
+
+
+
 ```
 
 
@@ -715,8 +708,6 @@ Tit<-c("Cocina",
 "Termo eléctrico",
 "global_active_power",
 "energia2")
-
-
 Uno<-Granularidad_horas  %>% filter(year== 2009 & day==2 & month==1 & (hour==0 | hour==1 | hour==2 | hour==3 | hour==4 | hour==5  ) ) 
 Uno<-data.frame(Tit, apply(Uno[,c(11,12,13,14,15)],2,sum) )
 Uno<-data.frame(key=c("Cocina","Lavadero","Termo eléctrico","No submeterizados"),
@@ -849,8 +840,6 @@ fig <- fig %>% layout(title = 'Porcentaje del total de consumo energético', sho
                       yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 fig
-
-
 ```
 
 

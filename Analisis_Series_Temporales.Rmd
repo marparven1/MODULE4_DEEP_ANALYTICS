@@ -3,29 +3,213 @@ title: "Análisis de Series Temporales"
 subtitle: "IOT Analytics"
 author: "Marta Venegas Pardo"
 date: "2/9/2022"
-output: html_document
+output: 
+  rmdformats::readthedown:
+    code_folding: show
+    self_contained: true
+    thumbnails: false
+    lightbox: false
+pkgdown:
+  as_is: true    
 ---
 
+
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(rmdformats)
+## Global options
+options(max.print = "80")
+knitr::opts_chunk$set(
+  echo = FALSE, cache = FALSE, prompt = FALSE,
+  tidy = FALSE, comment = NA,
+  message = FALSE, warning = FALSE
+)
+opts_knit$set(width = 80)
+setwd("~/Desktop/UBIQUM/Advanced Data Analytics and Machine Learning/MODULE4_DEEP_ANALYTICS")
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r librerias ,message=FALSE}
+library(dplyr)
+library(tidyverse)
+library(kableExtra)
+library(DT) # DataTables
 
-```{r cars}
-summary(cars)
+library(lubridate) # Fechas
+
+library(imputeTS) # Tratamiento de datos faltantes
+
+library(plotly)   # Gráficas
+library(ggplot2)  # Gráficas
+library(ggfortify)
+
+# install.packages("RMySQL")
+library(RMySQL) # Conexión a la BBDD
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r , cargaDatos}
+load(file="Datos/DF_Energia_GMinutos.RData")
+load(file="Datos/DF_Energia_GHoras.RData")
+load(file="Datos/DF_Energia_GDiaria.RData")
+load(file="Datos/DF_Energia_GMensual.RData")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+# Preparación para analizar los datos. Series temporales
+
+
+## Plan
+
+
+Vamos a analizar la serie temporal del submedidor 3, aire acondicionado y termo eléctrico. Vamos a extraer 52 observaciones opr año, esto es igual a una observación diaria. Lunes a las 20h.
+Años 2007, 2008 y 2009
+
+
+
+```{r}
+## Subset
+house070809weekly <- filter(DatosCompletos, weekday == 2 & hour == 20 & minute == 1)
+## Creamos un objeto TS
+tsSM3_070809weekly <- ts(house070809weekly$Sub_metering_3, frequency=52, start=c(2007,1))
+```
+
+```{r}
+## Plot sub-meter 3 with autoplot - add labels, color
+autoplot(tsSM3_070809weekly, ts.colour = 'red', xlab = "Año", ylab = "Energía (Varios-hora)", main = "Serie Temporal del aire acondicionado y termo eléctrico")
+```
+
+
+## Evolución mensual del consumo. Años 2007-2009
+
+
+Vamos a representar la serie por meses para cada submedidor y tambien para la energía global co granularidad mensual. En este caso, la frecuencia será 12, tenemos una observación por mes para los años 2007,8 y 2009.
+
+
+```{r}
+seriesMensuales <- Granularidad_meses %>% filter(year != 2006 & year != 2010)
+## Creamos un objeto TS
+tsSM1_Mensual<- ts(seriesMensuales$Sub_metering_1, frequency=12, start=c(2007,1))
+tsSM2_Mensual<- ts(seriesMensuales$Sub_metering_2, frequency=12, start=c(2007,1))
+tsSM3_Mensual<- ts(seriesMensuales$Sub_metering_3, frequency=12, start=c(2007,1))
+tsSM_GAP_Mensual<- ts(seriesMensuales$Global_active_power, frequency=12, start=c(2007,1))
+```
+
+```{r}
+## Plot sub-meter 3 with autoplot - add labels, color
+autoplot(tsSM1_Mensual, ts.colour = 'red', xlab = "Año", ylab = "Energía (Varios-hora)", main = "Evolución mensual del consumo de energía de la cocina \n Años 2007-2009")
+autoplot(tsSM2_Mensual, xlab = "Año", ylab = "Energía (Varios-hora)", main = "Evolución mensual del consumo de energía de la lavandería \n Años 2007-2009")
+autoplot(tsSM3_Mensual, ts.colour = 'blue', xlab = "Año", ylab = "Energía (Varios-hora)", main = "Evolución mensual del consumo de energía del aire acondicionado y termo eléctrico \n Años 2007-2009")
+autoplot(tsSM_GAP_Mensual, ts.colour = 'green', xlab = "Año", ylab = "Energía (Varios-hora)", main = "Evolución mensual del consumo de energía \n Años 2007-2009")
+```
+
+
+Hay tendencia (creciente) y estacionalidad. Las oscilaciones presentan un patrón.
+
+
+## Evolución diaria del consumo por meses
+
+### Mes de Enero
+
+```{r}
+seriesDiariasEnero <- Granularidad_dias %>% filter(year != 2006 & year != 2010 & month == 1)
+## Creamos un objeto TS
+   tsSM1_DiariaEnero<- ts(seriesDiariasEnero$Sub_metering_1, frequency=31, start=c(2007,1))
+   
+   tsSM2_DiariaEnero<- ts(seriesDiariasEnero$Sub_metering_2, frequency=31, start=c(2007,1))
+   
+   tsSM3_DiariaEnero<- ts(seriesDiariasEnero$Sub_metering_3, frequency=31, start=c(2007,1))
+   
+tsSM_GAP_DiariaEnero<- ts(seriesDiariasEnero$Global_active_power, frequency=31, start=c(2007,1))
+```
+
+```{r}
+## Plot sub-meter 3 with autoplot - add labels, color
+autoplot(tsSM1_DiariaEnero, ts.colour = 'red', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía de la cocina en el mes de Enero \n Años 2007-2009")
+autoplot(tsSM2_DiariaEnero, xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía de la lavandería en el mes de Enero \n Años 2007-2009")
+autoplot(tsSM3_DiariaEnero, ts.colour = 'blue', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía del aire acondicionado y termo eléctrico en el mes de Enero \n Años 2007-2009")
+autoplot(tsSM_GAP_DiariaEnero, ts.colour = 'green', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía en el mes de Enero \n Años 2007-2009")
+```
+
+Parece que no existen muchos patrones que nos podrían ayudar a hacer predicciones, no serían muy fiables
+
+```{r}
+Granularidad_horas
+```
+
+
+
+
+
+
+
+### Mes de Febrero
+
+```{r}
+seriesDiariasFebrero <- Granularidad_dias %>% filter(year != 2006 & year != 2010 & month == 2)
+## Creamos un objeto TS
+   tsSM1_DiariaFebrero<- ts(seriesDiariasFebrero$Sub_metering_1, frequency=28, start=c(2007,1))
+   tsSM2_DiariaFebrero<- ts(seriesDiariasFebrero$Sub_metering_2, frequency=28, start=c(2007,1))
+   tsSM3_DiariaFebrero<- ts(seriesDiariasFebrero$Sub_metering_3, frequency=28, start=c(2007,1))
+tsSM_GAP_DiariaFebrero<- ts(seriesDiariasFebrero$Global_active_power, frequency=28, start=c(2007,1))
+```
+
+```{r}
+## Plot sub-meter 3 with autoplot - add labels, color
+autoplot(tsSM1_DiariaFebrero, ts.colour = 'red', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía de la cocina en el mes de Febrero \n Años 2007-2009")
+autoplot(tsSM2_DiariaFebrero, xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía de la lavandería en el mes de Febrero \n Años 2007-2009")
+autoplot(tsSM3_DiariaFebrero, ts.colour = 'blue', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía del aire acondicionado y termo eléctrico en el mes de Febrero \n Años 2007-2009")
+autoplot(tsSM_GAP_DiariaFebrero, ts.colour = 'green', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía en el mes de Febrero \n Años 2007-2009")
+```
+
+
+
+
+
+
+
+
+
+
+
+### Mes de Marzo
+
+```{r}
+seriesDiariasMarzo <- Granularidad_dias %>% filter(year != 2006 & year != 2010 & month == 3)
+## Creamos un objeto TS
+   tsSM1_DiariaMarzo<- ts(seriesDiariasMarzo$Sub_metering_1, frequency=31, start=c(2007,1))
+   tsSM2_DiariaMarzo<- ts(seriesDiariasMarzo$Sub_metering_2, frequency=31, start=c(2007,1))
+   tsSM3_DiariaMarzo<- ts(seriesDiariasMarzo$Sub_metering_3, frequency=31, start=c(2007,1))
+tsSM_GAP_DiariaMarzo<- ts(seriesDiariasMarzo$Global_active_power, frequency=28, start=c(2007,1))
+```
+
+```{r}
+## Plot sub-meter 3 with autoplot - add labels, color
+autoplot(tsSM1_DiariaMarzo, ts.colour = 'red', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía de la cocina en el mes de Marzo \n Años 2007-2009")
+autoplot(tsSM2_DiariaMarzo, xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía de la lavandería en el mes de Marzo \n Años 2007-2009")
+autoplot(tsSM3_DiariaMarzo, ts.colour = 'blue', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía del aire acondicionado y termo eléctrico en el mes de Marzo \n Años 2007-2009")
+autoplot(tsSM_GAP_DiariaMarzo, ts.colour = 'green', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía en el mes de Marzo \n Años 2007-2009")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
