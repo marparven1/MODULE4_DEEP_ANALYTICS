@@ -21,7 +21,7 @@ library(rmdformats)
 ## Global options
 options(max.print = "80")
 knitr::opts_chunk$set(
-  echo = FALSE, cache = FALSE, prompt = FALSE,
+  echo = TRUE, cache = FALSE, prompt = FALSE,
   tidy = FALSE, comment = NA,
   message = FALSE, warning = FALSE
 )
@@ -60,25 +60,26 @@ load(file="Datos/DF_Energia_GMensual.RData")
 
 
 
-# Preparación para analizar los datos. Series temporales
-
-
-
-## Objetivo
+# Objetivo
 
 Proyección del consumo energético a través de series temporales.
 
-## Procedimiento
+# Procedimiento
 
 Estudiaremos los datos de consumo energético correspondientes a los años 2007 a 2009 a través de series temporales. 
 
 Haremos proyección de futuro para el año 2010 y compararemos los resultados con los datos reales de este último año (serie real).
 
+Series que vamos a estudiar:
 
-## Preparación para analizar los datos. Primera visualización
+- Evolución mensual del consumo para los años 2007-2009. Predicción para el año 2010
+- Evolución diaria del consumo. Años 2007-2009. Predicción para el año 2010
+- Evolución semanal del consumo. Años 2007-2009 . Predicción para el año 2010
 
-### Evolución mensual del consumo. Años 2007-2009
 
+# Evolución mensual del consumo. Años 2007-2009
+
+## Serie temporal y visualización
 
 Vamos a representar la serie por meses para cada submedidor y tambien para la energía global co granularidad mensual. En este caso, la frecuencia será 12, tenemos una observación por mes para los años 2007,8 y 2009.
 
@@ -94,7 +95,7 @@ tsSM_GAP_Mensual<- ts(seriesMensuales$Global_active_power, frequency=12, start=c
 
 ```{r}
 ## Plot sub-meter 3 with autoplot - add labels, color
-autoplot(tsSM1_Mensual, ts.colour = 'red', xlab = "Año", ylab = "Energía (Varios-hora)", main = "Evolución mensual del consumo de energía de la cocina \n Años 2007-2009")
+autoplot(tsSM1_Mensual, ts.colour = 'red', xlab = "Año", ylab = "Energía (Varios-hora)", main = "Evolución mensual del consumo de energía de la cocina \n Años 2007-2009")# + scale_x_date(date_labels = '%b%')
 autoplot(tsSM2_Mensual, xlab = "Año", ylab = "Energía (Varios-hora)", main = "Evolución mensual del consumo de energía de la lavandería \n Años 2007-2009")
 autoplot(tsSM3_Mensual, ts.colour = 'blue', xlab = "Año", ylab = "Energía (Varios-hora)", main = "Evolución mensual del consumo de energía del aire acondicionado y termo eléctrico \n Años 2007-2009")
 autoplot(tsSM_GAP_Mensual, ts.colour = 'green', xlab = "Año", ylab = "Energía (Varios-hora)", main = "Evolución mensual del consumo de energía \n Años 2007-2009")
@@ -108,18 +109,16 @@ Parece que los datos tienen estacionariedad (movimientos que se repiten cada añ
 
 
 
-## Forecasting antes de descomponer la serie
+## Predicción del año 2010 antes de descomponer la serie
 
 
 Vamos a plicar regresión lineal a cada serie temporal, y veremos el valor de $R^2$ y del error cuadrático medio.
 
 
 
-### Evolución mensual del consumo. Años 2007-2009
+### SM1. Cocina
 
-#### SM1. Cocina
-
-##### Modelo
+#### Modelo
 
 ```{r}
 fitSM1_Mensual <- tslm(tsSM1_Mensual ~ trend + season) 
@@ -132,7 +131,7 @@ Resultados:
 
 - Hay tres coeficientes significativamente no nulos.
 
-##### Predicción IC
+#### Predicción IC
 
 Predicción para los próximos 20 días
 
@@ -151,9 +150,9 @@ plot(forecastfitSM1_Mensual, ylab= "Watt-Hours", xlab="Fecha",
 
 
 
-#### SM2. Lavadero
+### SM2. Lavadero
 
-##### Modelo
+#### Modelo
 
 ```{r}
 fitSM2_Mensual <- tslm(tsSM2_Mensual ~ trend + season) 
@@ -166,7 +165,7 @@ Resultados:
 
 - Hay tres coeficientes significativamente no nulos.
 
-##### Predicción IC
+#### Predicción IC
 
 Predicción para los próximos 12 meses (año 2010) 
 
@@ -190,9 +189,8 @@ Se prevee una bajada del consumo
 
 
 
-#### SM3. AC y termo
-
-##### Modelo
+### SM3. AC y termo
+#### Modelo
 
 ```{r}
 fitSM3_Mensual <- tslm(tsSM3_Mensual ~ trend + season) 
@@ -205,7 +203,7 @@ Resultados:
 
 - Hay tres coeficientes significativamente no nulos.
 
-##### Predicción IC
+#### Predicción IC
 
 Predicción para los próximos 12 meses (año 2010) 
 
@@ -226,7 +224,7 @@ Se prevee una bajada del consumo
 
 
 
-#### Comparación de los coeficientes y resultados de cada modelo
+### Comparación de los coeficientes y resultados de cada modelo
 
 
 
@@ -269,47 +267,55 @@ El RMSE del modelo con mejor coeficiente de determinación es el más alto. Pero
 
 
 
-
-
-
-
-
-
-
-
-
-
 ## Forecasting descomponiendo la serie (así ok)
-
-
 
 Descomponer: quitar tendencia
 
+### Descomposición de la serie y visualización
 
-### Descomposición y visualización
-
-
-#### Evolución mensual del consumo. Años 2007-2009
-
-##### Submetering 1
+#### Submetering 1
 
 ```{r}
-## Descomponer la serie
-Componentes_SM1_Mensual <- decompose(tsSM1_Mensual)
-## Plot
-plot(Componentes_SM1_Mensual )
-# stl(tsSM1_Mensual)
-## Check summary statistics for decomposed sub-meter 1
-summary(Componentes_SM1_Mensual )
+### Descomponer la serie
+#Componentes_SM1_Mensual <- decompose(tsSM1_Mensual)
+### Plot
+#plot(Componentes_SM1_Mensual )
+## stl(tsSM1_Mensual)
+### Check summary statistics for decomposed sub-meter 1
+#summary(Componentes_SM1_Mensual )
 ```
 
 
 Se aprecia componente estacional: oscilacione que se repiten cada año.
 La componente tendencia tambien se aprecia. Tendencia decreciente.
 
+```{r}
+ tsSM1_Mensual %>%
+  stl( #t.window=13,
+      s.window="periodic", 
+      robust=TRUE)  %>% summary()
+tsSM1_Mensual %>%
+  stl(t.window=13, s.window="periodic", robust=TRUE) %>%
+  autoplot()
+```
+Remainder no es un muelle. Observamos tendencia creciente y fuerte componente estacional
 
 
-##### Submetering 2
+```{r}
+Componentes_SM1_MensualSTL<- tsSM1_Mensual %>%stl( t.window=13,
+  s.window="periodic",  robust=TRUE)
+autoplot(Componentes_SM1_MensualSTL, ts.colour = 'red', main="Descomposición de componentes")
+plot.ts(tsSM1_Mensual, col = 'gray',
+         xlab = "Mes del año", 
+        ylab = "Energía (Varios-hora)", 
+        main = "Evolución mensual del consumo energético de la cocina")
+lines(Componentes_SM1_MensualSTL$time.series[,2], 
+      col = "red", lwd = 1, lty = 2)
+```
+
+
+
+#### Submetering 2
 
 ```{r}
 ## Descomponer la serie
@@ -324,17 +330,41 @@ Se aprecia componente estacional: oscilacione que se repiten cada año.
 La componente tendencia tambien se aprecia. Tendencia decreciente.
 
 
+```{r}
+ tsSM2_Mensual %>%
+  stl( #t.window=13,
+      s.window="periodic", 
+      robust=TRUE) %>% summary()
 
+tsSM2_Mensual %>%
+  stl(t.window=13, s.window="periodic", robust=TRUE) %>%
+  autoplot()
+```
 
-##### Submetering 3
 
 ```{r}
-## Descomponer la serie
-Componentes_SM3_Mensual <- decompose(tsSM3_Mensual)
-## Plot
-plot(Componentes_SM3_Mensual )
-## Check summary statistics for decomposed sub-meter 2
-summary(Componentes_SM3_Mensual )
+Componentes_SM2_MensualSTL<- tsSM2_Mensual %>%stl( #t.window=13,
+  s.window="periodic",  robust=TRUE)
+autoplot(Componentes_SM2_MensualSTL, ts.colour = 'blue')
+plot.ts(tsSM2_Mensual, col = 'gray')
+lines(Componentes_SM2_MensualSTL$time.series[,2], 
+      col = "red", lwd = 1, lty = 2)
+```
+
+
+
+
+
+
+#### Submetering 3
+
+```{r}
+## ## Descomponer la serie
+## Componentes_SM3_Mensual <- decompose(tsSM3_Mensual)
+## ## Plot
+## plot(Componentes_SM3_Mensual )
+## ## Check summary statistics for decomposed sub-meter 2
+## summary(Componentes_SM3_Mensual )
 ```
 
 
@@ -342,6 +372,24 @@ Se aprecia componente estacional: oscilacione que se repiten cada año.
 La componente tendencia tambien se aprecia. Tendencia creciente
 
 
+```{r}
+tsSM3_Mensual %>%
+  stl( #t.window=13,
+      s.window="periodic", 
+      robust=TRUE)  %>% summary()
+```
+
+
+
+
+```{r}
+Componentes_SM3_MensualSTL<- tsSM3_Mensual %>%stl( #t.window=13,
+  s.window="periodic",  robust=TRUE)
+autoplot(Componentes_SM3_MensualSTL, ts.colour = 'blue')
+plot.ts(tsSM3_Mensual, col = 'gray')
+lines(Componentes_SM3_MensualSTL$time.series[,2], 
+      col = "red", lwd = 1, lty = 2)
+```
 
 
 
@@ -349,20 +397,7 @@ La componente tendencia tambien se aprecia. Tendencia creciente
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Predicción con Holt-Winters (suavizado exponencial)
+### Predicción con Holt-Winters (suavizado exponencial) para el año 2010
 
 Sin estacionalidad 
 
@@ -370,11 +405,7 @@ Sería interesante verlo también con estacionalidad, para ver si se mantiene o 
 
 Tendencia de predicción (crecimiento o decrecimiento del consumo) y predicción teniendo en cuenta las componentes
 
-
-
-
 #### Evolución mensual del consumo (sin estacionalidad). Años 2007-2009
-
 
 ##### Cocina
 
@@ -384,19 +415,50 @@ Tendencia de predicción (crecimiento o decrecimiento del consumo) y predicción
 
 
 ```{r}
-tsSM1_Mensual_Adjusted <- tsSM1_Mensual - Componentes_SM1_Mensual$seasonal
-autoplot(tsSM1_Mensual_Adjusted)
+#tsSM1_Mensual_Adjusted <- tsSM1_Mensual - Componentes_SM1_Mensual$seasonal
+#autoplot(tsSM1_Mensual_Adjusted)
 ```
 
-Parece un muelle.
+
+```{r}
+tsSM1_Mensual_detrended <- tsSM1_Mensual - Componentes_SM1_MensualSTL$time.series[,1]
+plot.ts(tsSM1_Mensual_detrended, 
+        ylab = "Energía (Vatios-hora)", xlab="Mes del año", #ylim=c(0,3000),
+        main = 'Variabilidad del consumo energético de los datos sin estacionalidad',
+        cex.main = 0.85, col="gray")
+```
+
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(Componentes_SM1_MensualSTL$time.series[,3], 
+     col = "blue", main = 'Remainder', ylab = "")
+qqnorm(Componentes_SM1_MensualSTL$time.series[,3])
+qqline(Componentes_SM1_MensualSTL$time.series[,3])
+```
+
+
+```{r}
+shapiro.test(Componentes_SM1_MensualSTL$time.series[,3])
+```
+
+Los resíduos no son solo ruido. Aún hay estacionalidad
+
+Volvemos a descomponer la serie desestacionalizada una vez.
 
 
 ```{r}
 ## Volvemos a descomponer la serie
-plot(decompose(tsSM1_Mensual_Adjusted))
+plot(stl(tsSM1_Mensual_detrended ,s.window = "periodic",robust = TRUE),colour = 'red', main="Descomposición de la serie desestacionalizada")
 ```
 
 La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+
+
+
 
 
 ###### Suavizado exponencial de HoltWinters
@@ -404,8 +466,14 @@ La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que 
 
 
 ```{r}
+tsSM1_HW_Mensual <- HoltWinters(tsSM1_Mensual_detrended ,
 ## Holt Winters Exponential Smoothing & Plot
-tsSM1_HW_Mensual <- HoltWinters(tsSM1_Mensual_Adjusted, beta=TRUE, gamma=TRUE)
+                              #  tsSM1_Mensual_Adjusted, 
+#  beta=TRUE, 
+#gamma=TRUE,
+alpha=TRUE
+)
+
 # optimiza
 plot(tsSM1_HW_Mensual,
      xlab="Fecha",
@@ -413,6 +481,38 @@ plot(tsSM1_HW_Mensual,
      main="Suavizado exponencial de Holt-Winters")
 ```
 
+
+```{r}
+tsSM1_HW_Mensual <- HoltWinters(tsSM1_Mensual_detrended ,
+## Holt Winters Exponential Smoothing & Plot
+                              #  tsSM1_Mensual_Adjusted, 
+beta=TRUE, 
+gamma=TRUE,
+#alpha=TRUE
+)
+
+# optimiza
+plot(tsSM1_HW_Mensual,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+```{r}
+#tsSM1_HW_Mensual <- HoltWinters(tsSM1_Mensual_detrended ,
+### Holt Winters Exponential Smoothing & Plot
+#                              #  tsSM1_Mensual_Adjusted, 
+#  beta=TRUE, 
+#gamma=TRUE,
+#alpha=TRUE
+#)
+#
+## optimiza
+#plot(tsSM1_HW_Mensual,
+#     xlab="Fecha",
+#     ylab="Valores observados y ajustados",
+#     main="Suavizado exponencial de Holt-Winters")
+```
 
 
 ###### Pronóstico de HoltWinters para el año 2010
@@ -432,7 +532,10 @@ plot(tsSM1_HW_Mensual_for , ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado
 ## Forecast HoltWinters with diminished confidence levels
 tsSM1_HW_Mensual_forC <- forecast(tsSM1_HW_Mensual, h=12, level=c(10,25))
 ## Plot only the forecasted area
-plot(tsSM1_HW_Mensual_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+plot(tsSM1_HW_Mensual_forC, ylab= "Vatios-Hora", xlab="Fecha",
+     main="Pronóstico para el año 2010 (sin estacionalidad)", start(2010)
+     ,ylim=c(0,25000)
+     )
 ```
 
 
@@ -447,16 +550,46 @@ plot(tsSM1_HW_Mensual_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado
 
 ```{r}
 ## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
-tsSM2_Mensual_Adjusted <- tsSM2_Mensual - Componentes_SM2_Mensual$seasonal
-autoplot(tsSM2_Mensual_Adjusted)
+# tsSM2_Mensual_Adjusted <- tsSM2_Mensual - Componentes_SM2_Mensual$seasonal
+# autoplot(tsSM2_Mensual_Adjusted)
 ```
 
-No arece un muelle.
+
+
+
+```{r}
+tsSM2_Mensual_detrended <- tsSM2_Mensual - Componentes_SM2_MensualSTL$time.series[,2]
+plot.ts(tsSM2_Mensual_detrended, 
+        ylab = "Energía (Vatios-hora)", 
+        main = 'Seasonal variability of energy comsumption',
+        cex.main = 0.85)
+```
+
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(Componentes_SM2_MensualSTL$time.series[,3], 
+     col = "blue", main = 'Remainder', ylab = "")
+qqnorm(Componentes_SM2_MensualSTL$time.series[,3])
+qqline(Componentes_SM2_MensualSTL$time.series[,3])
+```
+
+
+```{r}
+shapiro.test(Componentes_SM2_MensualSTL$time.series[,3])
+```
+
+Los resíduos no siguen una distribución normal. La descomposición no es buena.
+
+
+
+
 
 
 ```{r}
 ## Volvemos a descomponer la serie
-plot(decompose(tsSM2_Mensual_Adjusted))
+plot(stl(tsSM2_Mensual_detrended ,s.window = "periodic",robust = TRUE))
 ```
 
 La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
@@ -468,7 +601,9 @@ La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que 
 
 ```{r}
 ## Holt Winters Exponential Smoothing & Plot
-tsSM2_HW_Mensual <- HoltWinters(tsSM2_Mensual_Adjusted, beta=TRUE, gamma=TRUE)
+tsSM2_HW_Mensual <- HoltWinters(tsSM2_Mensual_detrended ,
+                                # tsSM2_Mensual_Adjusted,
+                                beta=TRUE, gamma=TRUE)
 plot(tsSM2_HW_Mensual,
      xlab="Fecha",
      ylab="Valores observados y ajustados",
@@ -500,31 +635,47 @@ plot(tsSM2_HW_Mensual_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 ##### AC y termo eléctrico
 
 ```{r}
-## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
-tsSM3_Mensual_Adjusted <- tsSM3_Mensual - Componentes_SM3_Mensual$seasonal
-autoplot(tsSM3_Mensual_Adjusted)
+# ## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
+# tsSM3_Mensual_Adjusted <- tsSM3_Mensual - Componentes_SM3_Mensual$seasonal
+# autoplot(tsSM3_Mensual_Adjusted)
 ```
 
-No parece un muelle.
+
+
+```{r}
+tsSM3_Mensual_detrended <- tsSM3_Mensual - Componentes_SM3_MensualSTL$time.series[,2]
+plot.ts(tsSM3_Mensual_detrended, 
+        ylab = "Energía (Vatios-hora)", 
+        main = 'Seasonal variability of energy comsumption',
+        cex.main = 0.85)
+```
+
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(Componentes_SM3_MensualSTL$time.series[,3], 
+     col = "blue", main = 'Remainder', ylab = "")
+qqnorm(Componentes_SM3_MensualSTL$time.series[,3])
+qqline(Componentes_SM3_MensualSTL$time.series[,3])
+```
+
+
+```{r}
+shapiro.test(Componentes_SM3_MensualSTL$time.series[,3])
+```
+
+Los resíduos no siguen una distribución normal. La descomposición no es buena.
+
+
 
 
 ```{r}
 ## Volvemos a descomponer la serie
-plot(decompose(tsSM3_Mensual_Adjusted))
+plot(stl(tsSM3_Mensual_detrended ,s.window = "periodic",robust = TRUE))
 ```
 
 La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
@@ -536,7 +687,9 @@ La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que 
 
 ```{r}
 ## Holt Winters Exponential Smoothing & Plot
-tsSM3_HW_Mensual <- HoltWinters(tsSM3_Mensual_Adjusted, beta=TRUE, gamma=TRUE)
+tsSM3_HW_Mensual <- HoltWinters(tsSM3_Mensual_detrended ,
+                              # tsSM3_Mensual_Adjusted,
+                                beta=TRUE, gamma=TRUE)
 plot(tsSM3_HW_Mensual,
      xlab="Fecha",
      ylab="Valores observados y ajustados",
@@ -570,7 +723,7 @@ plot(tsSM3_HW_Mensual_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado
 
 
 
-##### Comparación de los coeficientes y resultados de cada predicción
+##### Comparación de los coeficientes y resultados de cada predicción. Datos sin estacionalidad
 
 
 En las gráficas de predicción, hemos observado que el ajuste no mantiene la tendencia de consumo energético de la serie.
@@ -582,48 +735,15 @@ RMSE_SM2_GranMensualFor<-accuracy(tsSM2_HW_Mensual_forC   ,DatosRealesSeriesMens
 RMSE_SM3_GranMensualFor<-accuracy(tsSM3_HW_Mensual_forC   ,DatosRealesSeriesMensuales$Sub_metering_3)[4]
 
 
-ResEvolMensual2<-
+ResEvolMensual2_SinEstacionalidadConTendencia <-
 cbind.data.frame(
       Submedidor=c("Cocina","Lavadero","AC y TermoE"),
       RMSE = c(RMSE_SM1_GranMensualFor,
                RMSE_SM2_GranMensualFor,
                RMSE_SM3_GranMensualFor)
-   
-    
 )
-
-ResEvolMensual2 %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+ResEvolMensual2_SinEstacionalidadConTendencia %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
 ```
-
-
-```{r}
-accuracy(tsSM2_HW_Mensual_forC   ,DatosRealesSeriesMensuales$Sub_metering_1)
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -635,9 +755,7 @@ accuracy(tsSM2_HW_Mensual_forC   ,DatosRealesSeriesMensuales$Sub_metering_1)
 
 #### Evolución mensual del consumo (con estacionalidad). Años 2007-2009
 
-
 Vamos a ver una predicción del consumo enegético de cada submedidor con el método de HW. En este caso, no eliminaremos la estacionalidad, para ver así si se mantiene la tendencia de consumo.
-
 
 ##### Cocina
 
@@ -654,19 +772,19 @@ Parece un muelle.
 
 ```{r}
 ## Volvemos a descomponer la serie
-plot(decompose(tsSM1_Mensual_AdjustedII))
+plot(stl(tsSM1_Mensual_AdjustedII,s.window = "periodic",robust = TRUE))
 ```
 
-La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+La componente estacional se mueve en un rango de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
 
 
 ###### Suavizado exponencial de HoltWinters
 
 
-
 ```{r}
 ## Holt Winters Exponential Smoothing & Plot
-tsSM1_HW_MensualII <- HoltWinters(tsSM1_Mensual_AdjustedII, beta=TRUE, gamma=TRUE)
+tsSM1_HW_MensualII <- HoltWinters(tsSM1_Mensual_AdjustedII, beta=TRUE, gamma=TRUE
+                                  )
 # optimiza
 plot(tsSM1_HW_MensualII,
      xlab="Fecha",
@@ -694,8 +812,9 @@ plot(tsSM1_HW_Mensual_forII , ylab= "Vatios-Hora", xlab="Fecha - AireAcondiciona
 ## Forecast HoltWinters with diminished confidence levels
 tsSM1_HW_Mensual_forCII <- forecast(tsSM1_HW_MensualII, h=12, level=c(10,25))
 ## Plot only the forecasted area
-plot(tsSM1_HW_Mensual_forCII, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+plot(tsSM1_HW_Mensual_forCII, ylab= "Vatios-Hora", xlab="Fecha", main="Pronóstico para el año 2010 (con estacionalidad)", start(2010))
 ```
+
 
 
 
@@ -773,6 +892,7 @@ plot(tsSM2_HW_Mensual_forCII, ylab= "Vatios-Hora", xlab="Fecha - AireAcondiciona
 
 
 
+
 ##### AC y termo eléctrico
 
 ```{r}
@@ -831,7 +951,7 @@ plot(tsSM3_HW_Mensual_forCII, ylab= "Vatios-Hora", xlab="Fecha - AireAcondiciona
 
 
 
-##### Comparación de los coeficientes y resultados de cada predicción
+##### Comparación de los coeficientes y resultados de cada predicción. Datos con estacionalidad
 
 
 ```{r}
@@ -840,7 +960,7 @@ RMSE_SM2_GranMensualForII<-accuracy(tsSM2_HW_Mensual_forCII   ,DatosRealesSeries
 RMSE_SM3_GranMensualForII<-accuracy(tsSM3_HW_Mensual_forCII   ,DatosRealesSeriesMensuales$Sub_metering_3)[4]
 
 
-ResEvolMensual2SinTendencia<-
+ResEvolMensual2SinTendenciaConEstacionalidad<-
 cbind.data.frame(
       Submedidor=c("Cocina","Lavadero","AC y TermoE"),
       RMSE = c(RMSE_SM1_GranMensualForII,
@@ -850,84 +970,27 @@ cbind.data.frame(
     
 )
 
-ResEvolMensual2SinTendencia %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
-```
-
-
-```{r}
-accuracy(tsSM2_HW_Mensual_forCII   ,DatosRealesSeriesMensuales$Sub_metering_3)
+ResEvolMensual2SinTendenciaConEstacionalidad %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
 ```
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#### Comparación de resultados. Predicción antes y despues de eliminar la tendencia
-
-
-En las gráficas de predicción de suaviazado exponencial, hemos observado que el ajuste cuando eliminamos la estacionalidad, no mantiene la tendencia de consumo energético de la serie. Sin embargo, al mantener la estacionalidad
-se puede apreciar como las predicciones ajustan la tendencia de la serie original
-
+#### Comparación de resultados. Predicción antes y despues de eliminar estacionalidad
 
 
 ```{r}
+Comparacion<-cbind.data.frame(
+  ResEvolMensual2_SinEstacionalidadConTendencia,
+  ResEvolMensual2SinTendenciaConEstacionalidad[,2])
 
-Comparacion<-cbind.data.frame(ResEvolMensual2SinTendencia,ResEvolMensual[,2])
-
-colnames(Comparacion) <- c("Submedidor","RMSE con estacionalidad","RMSEDeco sin estacionalidad")
+colnames(Comparacion) <- c("Submedidor","RMSE Con Estacionalidad","RMSE Sin estacionalidad")
 Comparacion %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
-         
-
 ```
 
 
-
-
-
-
-
-
-## Comparación de resultados. Predicción antes y despues de eliminar estacionalidad
-
-
-```{r}
-
-Comparacion<-cbind.data.frame(ResEvolMensual2,ResEvolMensual[,2])
-
-colnames(Comparacion) <- c("Submedidor","RMSE","RMSEDeco")
-Comparacion %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
-         
-
-```
-
-
-Resultados más fiables y con menor error trás haber descompuesto la serie
-
-
-
-
-
-
-
-
-
-
-
+Resultados más fiables y con menor error trás haber eliminado la estacionalidad de la serie. También así podemos ver la tendencia.
 
 
 ```{r}
@@ -939,6 +1002,2724 @@ Resultados más fiables y con menor error trás haber descompuesto la serie
 #             top="Sin estacionalidad",bottom="Con estacionalidad"
 #             )
 ```
+
+
+
+
+## Comparación de resultados. Predicción antes y despues de eliminar la tendencia (descomponer)
+
+En las gráficas de predicción de suaviazado exponencial, hemos observado que el ajuste cuando eliminamos la estacionalidad, no mantiene la tendencia de consumo energético de la serie. Sin embargo, al mantener la estacionalidad
+se puede apreciar como las predicciones ajustan la tendencia de la serie original
+
+
+```{r}
+# Predicción antes y despues de eliminar estacionalidad:
+Comparacion
+
+# Sin descomponer
+
+
+ComparacionII<-cbind.data.frame(ResEvolMensual,
+                              Comparacion[-1]
+                              )
+colnames(ComparacionII) <- c("Submedidor","RMSE","R^2","Con estacionalidad","Sin estacionalidad")
+ComparacionII %>% kable(booktabs=TRUE) %>% 
+  kable_styling(latex_options = "striped") %>% 
+  add_header_above( c("", "Serie sin descomponer" = 2, "Descomponiendo la serie" = 2)) %>% 
+  add_header_above( c("", "RMSE" = 4))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+# Evolución semanal del consumo. Años 2007-2009
+
+## Serie temporal y visualización
+
+Vamos a representar la serie por meses para cada submedidor y tambien para la energía global co granularidad mensual. En este caso, la frecuencia será 12, tenemos una observación por mes para los años 2007,8 y 2009.
+
+
+```{r}
+Granularidad_semanas <- Granularidad_horas %>% group_by(year, weekday) %>% 
+   summarize(
+      Sub_metering_1 = sum (Sub_metering_1),
+      Sub_metering_2 = sum (Sub_metering_2),
+      Sub_metering_3 = sum (Sub_metering_3),
+      Global_active_power = sum (Global_active_power),
+      energia2 = sum (energia2)
+   )
+```
+
+
+```{r}
+seriesSemanales <- rbind.data.frame(
+   filter(Granularidad_semanas, year== 2007  ),
+   filter(Granularidad_semanas, year== 2008  ),
+   filter(Granularidad_semanas, year== 2009  )
+)
+
+## Creamos un objeto TS
+   tsSM1_Semanal<- ts(seriesSemanales$Sub_metering_1,         frequency=7, start=c(2007,1))
+   tsSM2_Semanal<- ts(seriesSemanales$Sub_metering_2,         frequency=7, start=c(2007,1))
+   tsSM3_Semanal<- ts(seriesSemanales$Sub_metering_3,         frequency=7, start=c(2007,1))
+tsSM_GAP_Semanal<- ts(seriesSemanales$Global_active_power, frequency=7, start=c(2007,1))
+```
+
+
+
+
+
+
+```{r}
+## Plot sub-meter 3 with autoplot - add labels, color
+autoplot(tsSM1_Semanal, ts.colour = 'red', xlab = "Semana del año", ylab = "Energía (Varios-hora)", main = "Evolución semanal del consumo de energía de la cocina \n Años 2007-2009")
+autoplot(tsSM2_Semanal, xlab = "Semana del año", ylab = "Energía (Varios-hora)", main = "Evolución semanal del consumo de energía de la lavandería \n Años 2007-2009")
+autoplot(tsSM3_Semanal, ts.colour = 'blue', xlab = "Semana del año", ylab = "Energía (Varios-hora)", main = "Evolución semanal del consumo de energía del aire acondicionado y termo eléctrico \n Años 2007-2009")
+autoplot(tsSM_GAP_Semanal, ts.colour = 'green', xlab = "Semana del año", ylab = "Energía (Varios-hora)", main = "Evolución semanal del consumo de energía \n Años 2007-2009")
+```
+
+
+AC y Termo: podría apreciarse cierta estacionalidad
+Energía total: muelle
+
+
+## Predicción del año 2010 antes de descomponer la serie
+
+
+Vamos a plicar regresión lineal a cada serie temporal, y veremos el valor de $R^2$ y del error cuadrático medio.
+
+
+
+### SM1. Cocina
+
+#### Modelo
+
+```{r}
+fitSM1_Semanal <- tslm(tsSM1_Semanal ~ trend + season) 
+summary(fitSM1_Semanal)
+```
+
+Resultados:
+
+- Valor del coeficiente de determinación: 0.975. Es un valor bajo, el modelo únicamente explica el 97.5%  de la variabilidad total.
+
+- Hay tres coeficientes significativamente no nulos.
+
+#### Predicción IC
+
+Predicción para los próximos 20 días
+
+```{r}
+forecastfitSM1_Semanal <- forecast(fitSM1_Semanal, h=7, level=c(80,90))
+## h=12 para predecir el año 2010
+## Plot sub-meter 3 forecast, limit y and add labels
+plot(forecastfitSM1_Semanal, ylab= "Watt-Hours", xlab="Fecha",
+     main="Predicción del consumo energético semanal total del año 2010 \n  a través de un modelo de regresión")
+```
+
+
+
+
+
+
+
+
+### SM2. Lavadero
+
+#### Modelo
+
+```{r}
+fitSM2_Semanal <- tslm(tsSM2_Semanal ~ trend + season) 
+summary(fitSM2_Semanal)
+```
+
+Resultados:
+
+- Valor del coeficiente de determinación:  0.7717. Es un valor aceptable, el modelo únicamente explica el 77.17% de la variabilidad total.
+
+- Hay tres coeficientes significativamente no nulos.
+
+#### Predicción IC
+
+Predicción para los próximos 12 meses (año 2010) 
+
+```{r}
+forecastfitSM2_Semanal <- forecast(fitSM2_Semanal, h=7, level=c(80,90))
+## h=12 para predecir el año 2010
+## Plot sub-meter 3 forecast, limit y and add labels
+plot(forecastfitSM2_Semanal, ylab= "Watt-Hours", xlab="Fecha",
+     main="Predicción del consumo energético del año 2010 \n  a través de un modelo de regresión")
+```
+
+
+Se prevee una bajada del consumo
+
+
+
+
+
+
+
+
+
+
+### SM3. AC y termo
+#### Modelo
+
+```{r}
+fitSM3_Semanal <- tslm(tsSM3_Semanal ~ trend + season) 
+summary(fitSM3_Semanal)
+```
+
+Resultados:
+
+- Valor del coeficiente de determinación: 0.7601. Es un valor que podría ser aceptable, el modelo únicamente explica el 76% de la variabilidad total.
+
+- Hay tres coeficientes significativamente no nulos.
+
+#### Predicción IC
+
+Predicción para los próximos 12 meses (año 2010) 
+
+```{r}
+forecastfitSM3_Semanal <- forecast(fitSM3_Semanal, h=7, level=c(80,90))
+## h=12 para predecir el año 2010
+## Plot sub-meter 3 forecast, limit y and add labels
+plot(forecastfitSM3_Semanal, ylab= "Watt-Hours", xlab="Fecha",
+     main="Predicción del consumo energético del año 2010 \n  a través de un modelo de regresión")
+```
+
+
+Se prevee una bajada del consumo
+
+
+
+
+
+
+
+### Comparación de los coeficientes y resultados de cada modelo
+
+
+
+```{r}
+DatosRealesSeriesSemanales <- Granularidad_semanas %>% filter(year == 2010 )
+
+RMSE_SM1_GranSemanal<-accuracy(forecastfitSM1_Semanal  ,DatosRealesSeriesSemanales$Sub_metering_1)[4]
+  R2_SM1_GranSemanal<-0.975
+MASE_SM1_GranSemanal<-accuracy(forecastfitSM1_Semanal  ,DatosRealesSeriesSemanales$Sub_metering_1)[12]
+RMSE_SM2_GranSemanal<-accuracy(forecastfitSM2_Semanal  ,DatosRealesSeriesSemanales$Sub_metering_2)[4]
+  R2_SM2_GranSemanal<-0.7717
+MASE_SM2_GranSemanal<-accuracy(forecastfitSM2_Semanal  ,DatosRealesSeriesSemanales$Sub_metering_2)[12]
+RMSE_SM3_GranSemanal<-accuracy(forecastfitSM3_Semanal  ,DatosRealesSeriesSemanales$Sub_metering_3)[4]
+  R2_SM3_GranSemanal<-0.7601
+MASE_SM3_GranSemanal<-accuracy(forecastfitSM3_Semanal  ,DatosRealesSeriesSemanales$Sub_metering_3)[12]
+
+ResEvolSemanal<-
+cbind.data.frame(
+      Submedidor=c("Cocina","Lavadero","AC y TermoE"),
+      RMSE = c(RMSE_SM1_GranSemanal,
+               RMSE_SM2_GranSemanal,
+               RMSE_SM3_GranSemanal),
+     # MASE = c(MASE_SM1_GranMensual,MASE_SM2_GranMensual,MASE_SM3_GranMensual),
+      R2 = c(R2_SM1_GranSemanal,
+             R2_SM2_GranSemanal,
+             R2_SM3_GranSemanal)
+)
+
+ResEvolSemanal %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+
+
+# MASE: Mean absolute error
+# RMSE: root mean scuare error. Diferencia entre los valores predichos y los observados.
+
+
+```
+
+
+El RMSE del modelo con mejor coeficiente de determinación es el más alto. Pero no hay que olvidar que el consumo eléctrico para el submedidor correspondiente al AC y termo eléctrico es el que más energía consume de todos con una diferencia muy grande.
+
+
+
+
+
+
+
+
+
+
+
+## Forecasting descomponiendo la serie (así ok)
+
+Descomponer: quitar tendencia
+
+### Descomposición de la serie y visualización
+
+#### Submetering 1
+
+
+```{r}
+ tsSM1_Semanal %>%
+  stl( #t.window=13,
+      s.window="periodic", 
+      robust=TRUE)  %>% summary()
+tsSM1_Semanal %>%
+  stl(t.window=13, s.window="periodic", robust=TRUE) %>%
+  autoplot()
+```
+
+
+Remainder no es un muelle. Observamos tendencia creciente y fuerte componente estacional
+
+Se aprecia componente estacional: oscilacione que se repiten cada año.
+La componente tendencia tambien se aprecia. Tendencia decreciente.
+
+
+```{r}
+Componentes_SM1_SemanalSTL<- tsSM1_Semanal %>%stl( #t.window=13,
+  s.window="periodic",  robust=TRUE)
+autoplot(Componentes_SM1_SemanalSTL, ts.colour = 'blue')
+plot.ts(tsSM1_Semanal, col = 'gray')
+lines(Componentes_SM1_SemanalSTL$time.series[,2], 
+      col = "red", lwd = 1, lty = 2)
+```
+
+
+
+#### Submetering 2
+
+
+
+
+
+```{r}
+ tsSM2_Semanal %>%
+  stl( #t.window=13,
+      s.window="periodic", 
+      robust=TRUE) %>% summary()
+
+tsSM2_Semanal %>%
+  stl(t.window=13, s.window="periodic", robust=TRUE) %>%
+  autoplot()
+```
+
+
+```{r}
+Componentes_SM2_SemanalSTL<- tsSM2_Semanal %>%stl( #t.window=13,
+  s.window="periodic",  robust=TRUE)
+autoplot(Componentes_SM2_SemanalSTL, ts.colour = 'blue')
+plot.ts(tsSM2_Semanal, col = 'gray')
+lines(Componentes_SM2_SemanalSTL$time.series[,2], 
+      col = "red", lwd = 1, lty = 2)
+```
+
+
+
+Se aprecia componente estacional: oscilacione que se repiten cada año.
+La componente tendencia tambien se aprecia. Tendencia decreciente.
+
+
+
+
+
+#### Submetering 3
+
+
+
+Se aprecia componente estacional: oscilacione que se repiten cada año.
+La componente tendencia tambien se aprecia. Tendencia creciente
+
+
+```{r}
+tsSM3_Semanal %>%
+  stl( #t.window=13,
+      s.window="periodic", 
+      robust=TRUE)  %>% summary()
+```
+
+
+
+
+```{r}
+Componentes_SM3_SemanalSTL<- tsSM3_Semanal %>%stl( #t.window=13,
+  s.window="periodic",  robust=TRUE)
+autoplot(Componentes_SM3_SemanalSTL, ts.colour = 'blue')
+plot.ts(tsSM3_Semanal, col = 'gray')
+lines(Componentes_SM3_SemanalSTL$time.series[,2], 
+      col = "red", lwd = 1, lty = 2)
+```
+
+Tendencia creciente del consumo energético
+
+
+### Predicción con Holt-Winters (suavizado exponencial) para el año 2010
+
+Sin estacionalidad 
+
+Sería interesante verlo también con estacionalidad, para ver si se mantiene o no la tendencia.
+
+Tendencia de predicción (crecimiento o decrecimiento del consumo) y predicción teniendo en cuenta las componentes
+
+#### Evolución mensual del consumo (sin estacionalidad). Años 2007-2009
+
+##### Cocina
+
+
+
+
+
+
+```{r}
+#tsSM1_Mensual_Adjusted <- tsSM1_Mensual - Componentes_SM1_Mensual$seasonal
+#autoplot(tsSM1_Mensual_Adjusted)
+```
+
+
+```{r}
+tsSM1_Semanal_detrended <- tsSM1_Semanal - Componentes_SM1_SemanalSTL$time.series[,2]
+plot.ts(tsSM1_Semanal_detrended, 
+        ylab = "Energía (Vatios-hora)", 
+        main = 'Seasonal variability of energy comsumption',
+        cex.main = 0.85)
+```
+
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(Componentes_SM1_SemanalSTL$time.series[,3], 
+     col = "blue", main = 'Remainder', ylab = "")
+qqnorm(Componentes_SM1_SemanalSTL$time.series[,3])
+qqline(Componentes_SM1_SemanalSTL$time.series[,3])
+```
+
+
+```{r}
+shapiro.test(Componentes_SM1_SemanalSTL$time.series[,3])
+```
+
+Los resíduos no son solo ruido. Aún hay estacionalidad
+
+Volvemos a descomponer la serie desestacionalizada una vez.
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(stl(tsSM1_Semanal_detrended ,s.window = "periodic",robust = TRUE))
+```
+
+La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+
+
+
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM1_HW_Semanal <- HoltWinters(tsSM1_Semanal_detrended ,
+                              #  tsSM1_Mensual_Adjusted, 
+  beta=TRUE, gamma=TRUE)
+# optimiza
+plot(tsSM1_HW_Semanal,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM1_HW_Semanal_for <- forecast(tsSM1_HW_Semanal, h=7)
+plot(tsSM1_HW_Semanal_for , ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico",
+     main="Predicción del consumo energético semanal de la cocina \n Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM1_HW_Semanal_forC <- forecast(tsSM1_HW_Semanal, h=7, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM1_HW_Semanal_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción del consumo energético semanal para el año 2010", start(2010))
+```
+
+
+
+
+
+
+
+
+
+##### Lavadero
+
+```{r}
+## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
+# tsSM2_Mensual_Adjusted <- tsSM2_Mensual - Componentes_SM2_Mensual$seasonal
+# autoplot(tsSM2_Mensual_Adjusted)
+```
+
+
+
+
+```{r}
+tsSM2_Semanal_detrended <- tsSM2_Semanal - Componentes_SM2_SemanalSTL$time.series[,2]
+plot.ts(tsSM2_Semanal_detrended, 
+        ylab = "Energía (Vatios-hora)", 
+        main = 'Seasonal variability of energy comsumption',
+        cex.main = 0.85)
+```
+
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(Componentes_SM2_SemanalSTL$time.series[,3], 
+     col = "blue", main = 'Remainder', ylab = "")
+qqnorm(Componentes_SM2_SemanalSTL$time.series[,3])
+qqline(Componentes_SM2_SemanalSTL$time.series[,3])
+```
+
+
+```{r}
+shapiro.test(Componentes_SM2_SemanalSTL$time.series[,3])
+```
+
+Los resíduos no siguen una distribución normal. La descomposición no es buena.
+
+
+
+
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(stl(tsSM2_Semanal_detrended ,s.window = "periodic",robust = TRUE))
+```
+
+La componente estacional se mueve en un rango de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM2_HW_Semanal <- HoltWinters(tsSM2_Semanal_detrended ,
+                                # tsSM2_Mensual_Adjusted,
+                                beta=TRUE, gamma=TRUE)
+plot(tsSM2_HW_Semanal,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 7 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+     tsSM2_HW_Semanal_for <- forecast(tsSM2_HW_Semanal, h=7)
+plot(tsSM2_HW_Semanal_for , ylab= "Vatios-Hora", xlab="Fecha - Lavadero",
+     main="Predicción semanal del consumo energético del lavadero \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM2_HW_Semanal_forC <- forecast(tsSM2_HW_Semanal, h=12, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM2_HW_Semanal_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción semanal para el año 2010", start(2010))
+```
+
+
+
+
+##### AC y termo eléctrico
+
+```{r}
+# ## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
+# tsSM3_Mensual_Adjusted <- tsSM3_Mensual - Componentes_SM3_Mensual$seasonal
+# autoplot(tsSM3_Mensual_Adjusted)
+```
+
+
+
+```{r}
+tsSM3_Semanal_detrended <- tsSM3_Semanal - Componentes_SM3_SemanalSTL$time.series[,2]
+plot.ts(tsSM3_Semanal_detrended, 
+        ylab = "Energía (Vatios-hora)", 
+        main = 'Seasonal variability of energy comsumption',
+        cex.main = 0.85)
+```
+
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(Componentes_SM3_SemanalSTL$time.series[,3], 
+     col = "blue", main = 'Remainder', ylab = "")
+qqnorm(Componentes_SM3_SemanalSTL$time.series[,3])
+qqline(Componentes_SM3_SemanalSTL$time.series[,3])
+```
+
+
+```{r}
+shapiro.test(Componentes_SM3_SemanalSTL$time.series[,3])
+```
+
+Los resíduos no siguen una distribución normal. La descomposición no es buena.
+
+
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(stl(tsSM3_Semanal_detrended ,s.window = "periodic",robust = TRUE))
+```
+
+La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM3_HW_Semanal <- HoltWinters(tsSM3_Semanal_detrended ,
+                              # tsSM3_Mensual_Adjusted,
+                                beta=TRUE, gamma=TRUE)
+plot(tsSM3_HW_Semanal,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM3_HW_Semanal_for <- forecast(tsSM3_HW_Semanal, h=7)
+plot(tsSM3_HW_Semanal_for , ylab= "Vatios-Hora", xlab="Fecha - Lavadero",
+     main="Predicción del consumo energético semanal del AC y termo eléctrico \n Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM3_HW_Semanal_forC <- forecast(tsSM3_HW_Semanal, h=7, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM3_HW_Semanal_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción semanal del consumo energético para el año 2010", start(2010))
+```
+
+
+
+
+
+
+##### Comparación de los coeficientes y resultados de cada predicción. Datos sin estacionalidad
+
+
+En las gráficas de predicción, hemos observado que el ajuste no mantiene la tendencia de consumo energético de la serie.
+
+
+```{r}
+RMSE_SM1_GranSemanalFor<-accuracy(tsSM1_HW_Semanal_forC   ,DatosRealesSeriesSemanales$Sub_metering_1)[4]
+RMSE_SM2_GranSemanalFor<-accuracy(tsSM2_HW_Semanal_forC   ,DatosRealesSeriesSemanales$Sub_metering_2)[4]
+RMSE_SM3_GranSemanalFor<-accuracy(tsSM3_HW_Semanal_forC   ,DatosRealesSeriesSemanales$Sub_metering_3)[4]
+
+
+ResEvolSemanal2_SinEstacionalidadConTendencia <-
+cbind.data.frame(
+      Submedidor=c("Cocina","Lavadero","AC y TermoE"),
+      RMSE = c(RMSE_SM1_GranSemanalFor,
+               RMSE_SM2_GranSemanalFor,
+               RMSE_SM3_GranSemanalFor)
+)
+ResEvolSemanal2_SinEstacionalidadConTendencia %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+```
+
+
+
+
+
+
+
+
+
+#### Evolución mensual del consumo (con estacionalidad). Años 2007-2009
+
+Vamos a ver una predicción del consumo enegético de cada submedidor con el método de HW. En este caso, no eliminaremos la estacionalidad, para ver así si se mantiene la tendencia de consumo.
+
+##### Cocina
+
+
+
+```{r}
+tsSM1_Mensual_AdjustedII <- tsSM1_Mensual # - Componentes_SM1_Mensual$seasonal
+autoplot(tsSM1_Mensual_AdjustedII)
+```
+
+Parece un muelle.
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(decompose(tsSM1_Mensual_AdjustedII))
+```
+
+La componente estacional se mueve en un rango de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM1_HW_MensualII <- HoltWinters(tsSM1_Mensual_AdjustedII, beta=TRUE, gamma=TRUE)
+# optimiza
+plot(tsSM1_HW_MensualII,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM1_HW_Mensual_forII <- forecast(tsSM1_HW_MensualII, h=12)
+plot(tsSM1_HW_Mensual_forII , ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico",
+     main="Predicción del consumo energético de la cocina \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM1_HW_Mensual_forCII <- forecast(tsSM1_HW_MensualII, h=12, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM1_HW_Mensual_forCII, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+```
+
+
+
+
+
+
+
+
+
+
+##### Lavadero
+
+```{r}
+## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
+tsSM2_Mensual_AdjustedII <- tsSM2_Mensual ## - Componentes_SM2_Mensual$seasonal
+autoplot(tsSM2_Mensual_AdjustedII)
+```
+
+No arece un muelle.
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(decompose(tsSM2_Mensual_AdjustedII)) 
+```
+
+TENDENCIA CLARAMENTE DECRECIENTE. Tambien observamos esacionalidad
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM2_HW_MensualII <- HoltWinters(tsSM2_Mensual_AdjustedII, beta=TRUE, gamma=TRUE)
+plot(tsSM2_HW_MensualII,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM2_HW_Mensual_forII <- forecast(tsSM2_HW_MensualII, h=12)
+plot(tsSM2_HW_Mensual_forII , ylab= "Vatios-Hora", xlab="Fecha - Lavadero",
+     main="Predicción del consumo energético del lavadero \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM2_HW_Mensual_forCII <- forecast(tsSM2_HW_MensualII, h=12, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM2_HW_Mensual_forCII, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##### AC y termo eléctrico
+
+```{r}
+## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
+tsSM3_Mensual_AdjustedII <- tsSM3_Mensual # - Componentes_SM3_Mensual$seasonal
+autoplot(tsSM3_Mensual_AdjustedII)
+```
+
+No parece un muelle.
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(decompose(tsSM3_Mensual_AdjustedII))
+```
+
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM3_HW_MensualII <- HoltWinters(tsSM3_Mensual_AdjustedII, beta=TRUE, gamma=TRUE)
+plot(tsSM3_HW_MensualII,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM3_HW_Mensual_forII <- forecast(tsSM3_HW_MensualII, h=12)
+plot(tsSM3_HW_Mensual_forII , ylab= "Vatios-Hora", xlab="Fecha - Lavadero",
+     main="Predicción del consumo energético del AC y termo eléctrico \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM3_HW_Mensual_forCII <- forecast(tsSM3_HW_MensualII, h=12, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM3_HW_Mensual_forCII, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+```
+
+
+
+
+
+
+##### Comparación de los coeficientes y resultados de cada predicción. Datos con estacionalidad
+
+
+```{r}
+RMSE_SM1_GranMensualForII<-accuracy(tsSM1_HW_Mensual_forCII   ,DatosRealesSeriesMensuales$Sub_metering_1)[4]
+RMSE_SM2_GranMensualForII<-accuracy(tsSM2_HW_Mensual_forCII   ,DatosRealesSeriesMensuales$Sub_metering_2)[4]
+RMSE_SM3_GranMensualForII<-accuracy(tsSM3_HW_Mensual_forCII   ,DatosRealesSeriesMensuales$Sub_metering_3)[4]
+
+
+ResEvolMensual2SinTendenciaConEstacionalidad<-
+cbind.data.frame(
+      Submedidor=c("Cocina","Lavadero","AC y TermoE"),
+      RMSE = c(RMSE_SM1_GranMensualForII,
+               RMSE_SM2_GranMensualForII,
+               RMSE_SM3_GranMensualForII)
+   
+    
+)
+
+ResEvolMensual2SinTendenciaConEstacionalidad %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+```
+
+
+
+
+
+#### Comparación de resultados. Predicción antes y despues de eliminar estacionalidad
+
+
+```{r}
+Comparacion<-cbind.data.frame(
+  ResEvolMensual2_SinEstacionalidadConTendencia,
+  ResEvolMensual2SinTendenciaConEstacionalidad[,2])
+
+colnames(Comparacion) <- c("Submedidor","RMSE Con Estacionalidad","RMSE Sin estacionalidad")
+Comparacion %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+```
+
+
+Resultados más fiables y con menor error trás haber eliminado la estacionalidad de la serie. También así podemos ver la tendencia.
+
+
+```{r}
+#p1<-autoplot(tsSM1_Mensual_Adjusted)
+#p2<-autoplot(tsSM1_Mensual_AdjustedII)
+#grid.arrange(
+#             grobs = list(p1,p2),
+#           nrow = 2,
+#             top="Sin estacionalidad",bottom="Con estacionalidad"
+#             )
+```
+
+
+
+
+
+
+
+
+
+
+
+
+# Evolución del consumo energético por semana del año.
+
+## Serie temporal y visualización
+
+Vamos a representar la serie por meses para cada submedidor y tambien para la energía global co granularidad mensual. En este caso, la frecuencia será 12, tenemos una observación por mes para los años 2007,8 y 2009.
+
+
+```{r}
+Granularidad_semanas <- Granularidad_horas %>% group_by(year, week) %>% 
+   summarize(
+      Sub_metering_1 = sum (Sub_metering_1),
+      Sub_metering_2 = sum (Sub_metering_2),
+      Sub_metering_3 = sum (Sub_metering_3),
+      Global_active_power = sum (Global_active_power),
+      energia2 = sum (energia2)
+   )
+```
+
+
+```{r}
+seriesSemanales <- rbind.data.frame(
+   filter(Granularidad_semanas, year== 2007  ),
+   filter(Granularidad_semanas, year== 2008  ),
+   filter(Granularidad_semanas, year== 2009  )
+)
+
+## Creamos un objeto TS
+   tsSM1_Semanal<- ts(seriesSemanales$Sub_metering_1,         frequency=53, start=c(2007,1))
+   tsSM2_Semanal<- ts(seriesSemanales$Sub_metering_2,         frequency=53, start=c(2007,1))
+   tsSM3_Semanal<- ts(seriesSemanales$Sub_metering_3,         frequency=53, start=c(2007,1))
+tsSM_GAP_Semanal<- ts(seriesSemanales$Global_active_power,    frequency=53, start=c(2007,1))
+```
+
+
+
+
+
+
+```{r}
+## Plot sub-meter 3 with autoplot - add labels, color
+autoplot(tsSM1_Semanal, ts.colour = 'red', xlab = "Semana del año", ylab = "Energía (Varios-hora)", main = "Evolución semanal del consumo de energía de la cocina \n Años 2007-2009")
+autoplot(tsSM2_Semanal, xlab = "Semana del año", ylab = "Energía (Varios-hora)", main = "Evolución semanal del consumo de energía de la lavandería \n Años 2007-2009")
+autoplot(tsSM3_Semanal, ts.colour = 'blue', xlab = "Semana del año", ylab = "Energía (Varios-hora)", main = "Evolución semanal del consumo de energía del aire acondicionado y termo eléctrico \n Años 2007-2009")
+autoplot(tsSM_GAP_Semanal, ts.colour = 'green', xlab = "Semana del año", ylab = "Energía (Varios-hora)", main = "Evolución semanal del consumo de energía \n Años 2007-2009")
+```
+
+
+AC y Termo: podría apreciarse cierta estacionalidad
+Energía total: muelle
+
+
+## Predicción del año 2010 antes de descomponer la serie
+
+
+Vamos a plicar regresión lineal a cada serie temporal, y veremos el valor de $R^2$ y del error cuadrático medio.
+
+
+
+### SM1. Cocina
+
+#### Modelo
+
+```{r}
+fitSM1_Semanal <- tslm(tsSM1_Semanal ~ trend + season) 
+summary(fitSM1_Semanal)
+```
+
+Resultados:
+
+- Valor del coeficiente de determinación: 0.4836. Es un valor bajo, el modelo únicamente explica el 48%  de la variabilidad total.
+
+- Hay un coeficiente significativamente no nulo.
+
+#### Predicción IC
+
+Predicción para los próximos 20 días
+
+```{r}
+forecastfitSM1_Semanal <- forecast(fitSM1_Semanal, h=53, level=c(80,90))
+## h=12 para predecir el año 2010
+## Plot sub-meter 3 forecast, limit y and add labels
+plot(forecastfitSM1_Semanal, ylab= "Watt-Hours", xlab="Fecha",
+     main="Predicción del consumo energético semanal total del año 2010 \n  a través de un modelo de regresión")
+```
+
+
+
+
+
+
+
+
+### SM2. Lavadero
+
+#### Modelo
+
+```{r}
+fitSM2_Semanal <- tslm(tsSM2_Semanal ~ trend + season) 
+summary(fitSM2_Semanal)
+```
+
+Resultados:
+
+- Valor del coeficiente de determinación:  0.5326. Es un valor aceptable, el modelo únicamente explica el 53% de la variabilidad total.
+
+- Hay tres coeficientes significativamente no nulos.
+
+#### Predicción IC
+
+Predicción para los próximos 12 meses (año 2010) 
+
+```{r}
+forecastfitSM2_Semanal <- forecast(fitSM2_Semanal, h=53, level=c(80,90))
+## h=12 para predecir el año 2010
+## Plot sub-meter 3 forecast, limit y and add labels
+plot(forecastfitSM2_Semanal, ylab= "Watt-Hours", xlab="Fecha",
+     main="Predicción del consumo energético del año 2010 \n  a través de un modelo de regresión")
+```
+
+
+Se prevee una bajada del consumo
+
+
+
+
+
+
+
+
+
+
+### SM3. AC y termo
+#### Modelo
+
+```{r}
+fitSM3_Semanal <- tslm(tsSM3_Semanal ~ trend + season) 
+summary(fitSM3_Semanal)
+```
+
+Resultados:
+
+- Valor del coeficiente de determinación: 0.7153. Es un valor que podría ser aceptable, el modelo únicamente explica el 71% de la variabilidad total.
+
+- Hay tres coeficientes significativamente no nulos.
+
+#### Predicción IC
+
+Predicción para los próximos 12 meses (año 2010) 
+
+```{r}
+forecastfitSM3_Semanal <- forecast(fitSM3_Semanal, h=53, level=c(80,90))
+## h=12 para predecir el año 2010
+## Plot sub-meter 3 forecast, limit y and add labels
+plot(forecastfitSM3_Semanal, ylab= "Watt-Hours", xlab="Fecha",
+     main="Predicción del consumo energético del año 2010 \n  a través de un modelo de regresión")
+```
+
+
+Se prevee una bajada del consumo
+
+
+
+
+
+
+
+### Comparación de los coeficientes y resultados de cada modelo
+
+
+
+```{r}
+###  DatosRealesSeriesSemanales <- Granularidad_semanas %>% filter(year == 2010 ###  )
+###  
+###  RMSE_SM1_GranSemanal<-accuracy(forecastfitSM1_Semanal  ###  ,DatosRealesSeriesSemanales$Sub_metering_1)[4]
+###    R2_SM1_GranSemanal<-0.975
+###  MASE_SM1_GranSemanal<-accuracy(forecastfitSM1_Semanal  ###  ,DatosRealesSeriesSemanales$Sub_metering_1)[12]
+###  RMSE_SM2_GranSemanal<-accuracy(forecastfitSM2_Semanal  ###  ,DatosRealesSeriesSemanales$Sub_metering_2)[4]
+###    R2_SM2_GranSemanal<-0.7717
+###  MASE_SM2_GranSemanal<-accuracy(forecastfitSM2_Semanal  ###  ,DatosRealesSeriesSemanales$Sub_metering_2)[12]
+###  RMSE_SM3_GranSemanal<-accuracy(forecastfitSM3_Semanal  ###  ,DatosRealesSeriesSemanales$Sub_metering_3)[4]
+###    R2_SM3_GranSemanal<-0.7601
+###  MASE_SM3_GranSemanal<-accuracy(forecastfitSM3_Semanal  ###  ,DatosRealesSeriesSemanales$Sub_metering_3)[12]
+###  
+###  ResEvolSemanal<-
+###  cbind.data.frame(
+###        Submedidor=c("Cocina","Lavadero","AC y TermoE"),
+###        RMSE = c(RMSE_SM1_GranSemanal,
+###                 RMSE_SM2_GranSemanal,
+###                 RMSE_SM3_GranSemanal),
+###       # MASE = c(MASE_SM1_GranMensual,MASE_SM2_GranMensual,MASE_SM3_GranMen###  sual),
+###        R2 = c(R2_SM1_GranSemanal,
+###               R2_SM2_GranSemanal,
+###               R2_SM3_GranSemanal))
+###  ResEvolSemanal %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = ###  "striped")
+###  
+###  # MASE: Mean absolute error
+###  # RMSE: root mean scuare error. Diferencia entre los valores predichos y ###  los observados.
+```
+
+
+El RMSE del modelo con mejor coeficiente de determinación es el más alto. Pero no hay que olvidar que el consumo eléctrico para el submedidor correspondiente al AC y termo eléctrico es el que más energía consume de todos con una diferencia muy grande.
+
+
+
+
+
+
+
+
+
+
+
+## Forecasting descomponiendo la serie (así ok)
+
+Descomponer: quitar tendencia
+
+### Descomposición de la serie y visualización
+
+#### Submetering 1
+
+
+```{r}
+ tsSM1_Semanal %>%
+  stl( #t.window=13,
+      s.window="periodic", 
+      robust=TRUE)  %>% summary()
+#tsSM1_Semanal %>%
+#  stl(t.window=13, s.window="periodic", robust=TRUE) %>%
+#  autoplot()
+```
+
+
+Remainder no es un muelle. Observamos tendencia creciente y fuerte componente estacional
+
+Se aprecia componente estacional: oscilacione que se repiten cada año.
+La componente tendencia tambien se aprecia. Tendencia decreciente.
+
+
+```{r}
+Componentes_SM1_SemanalSTL<- tsSM1_Semanal %>%stl( #t.window=13,
+  s.window="periodic",  robust=TRUE)
+autoplot(Componentes_SM1_SemanalSTL, ts.colour = 'blue')
+plot.ts(tsSM1_Semanal, col = 'gray')
+lines(Componentes_SM1_SemanalSTL$time.series[,2], 
+      col = "red", lwd = 1, lty = 2)
+```
+
+
+
+#### Submetering 2
+
+
+
+
+
+```{r}
+ tsSM2_Semanal %>%
+  stl( #t.window=13,
+      s.window="periodic", 
+      robust=TRUE) %>% summary()
+
+#tsSM2_Semanal %>%
+#  stl(t.window=13, s.window="periodic", robust=TRUE) %>%
+#  autoplot()
+```
+
+
+```{r}
+Componentes_SM2_SemanalSTL<- tsSM2_Semanal %>%stl( #t.window=13,
+  s.window="periodic",  robust=TRUE)
+autoplot(Componentes_SM2_SemanalSTL, ts.colour = 'blue')
+plot.ts(tsSM2_Semanal, col = 'gray')
+lines(Componentes_SM2_SemanalSTL$time.series[,2], 
+      col = "red", lwd = 1, lty = 2)
+```
+
+
+
+Se aprecia componente estacional: oscilacione que se repiten cada año.
+La componente tendencia tambien se aprecia. Tendencia decreciente.
+
+
+
+
+
+#### Submetering 3
+
+
+
+Se aprecia componente estacional: oscilacione que se repiten cada año.
+La componente tendencia tambien se aprecia. Tendencia creciente
+
+
+```{r}
+tsSM3_Semanal %>%
+  stl( #t.window=13,
+      s.window="periodic", 
+      robust=TRUE)  %>% summary()
+```
+
+
+
+
+```{r}
+Componentes_SM3_SemanalSTL<- tsSM3_Semanal %>%stl( #t.window=13,
+  s.window="periodic",  robust=TRUE)
+autoplot(Componentes_SM3_SemanalSTL, ts.colour = 'blue')
+plot.ts(tsSM3_Semanal, col = 'gray')
+lines(Componentes_SM3_SemanalSTL$time.series[,2], 
+      col = "red", lwd = 1, lty = 2)
+```
+
+Tendencia creciente del consumo energético
+
+
+### Predicción con Holt-Winters (suavizado exponencial) para el año 2010
+
+Sin estacionalidad 
+
+Sería interesante verlo también con estacionalidad, para ver si se mantiene o no la tendencia.
+
+Tendencia de predicción (crecimiento o decrecimiento del consumo) y predicción teniendo en cuenta las componentes
+
+#### Evolución mensual del consumo (sin estacionalidad). Años 2007-2009
+
+##### Cocina
+
+
+
+
+
+
+```{r}
+#tsSM1_Mensual_Adjusted <- tsSM1_Mensual - Componentes_SM1_Mensual$seasonal
+#autoplot(tsSM1_Mensual_Adjusted)
+```
+
+
+```{r}
+tsSM1_Semanal_detrended <- tsSM1_Semanal - Componentes_SM1_SemanalSTL$time.series[,2]
+plot.ts(tsSM1_Semanal_detrended, 
+        ylab = "Energía (Vatios-hora)", 
+        main = 'Seasonal variability of energy comsumption',
+        cex.main = 0.85)
+```
+
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(Componentes_SM1_SemanalSTL$time.series[,3], 
+     col = "blue", main = 'Remainder', ylab = "")
+qqnorm(Componentes_SM1_SemanalSTL$time.series[,3])
+qqline(Componentes_SM1_SemanalSTL$time.series[,3])
+```
+
+
+```{r}
+shapiro.test(Componentes_SM1_SemanalSTL$time.series[,3])
+```
+
+Los resíduos no son solo ruido. Aún hay estacionalidad
+
+Volvemos a descomponer la serie desestacionalizada una vez.
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(stl(tsSM1_Semanal_detrended ,s.window = "periodic",robust = TRUE))
+```
+
+La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+
+
+
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM1_HW_Semanal <- HoltWinters(tsSM1_Semanal_detrended ,
+                              #  tsSM1_Mensual_Adjusted, 
+  beta=TRUE, gamma=TRUE)
+# optimiza
+plot(tsSM1_HW_Semanal,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 53 observaciones, es decir, el consumo energético semanal de cada submedidor para las 53 semanas del año 2010.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM1_HW_Semanal_for <- forecast(tsSM1_HW_Semanal, h=53)
+plot(tsSM1_HW_Semanal_for , ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico",
+     main="Predicción del consumo energético semanal de la cocina \n Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM1_HW_Semanal_forC <- forecast(tsSM1_HW_Semanal, h=53, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM1_HW_Semanal_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción del consumo energético semanal para el año 2010", start(2010))
+```
+
+
+
+
+
+
+
+
+
+##### Lavadero
+
+```{r}
+## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
+# tsSM2_Mensual_Adjusted <- tsSM2_Mensual - Componentes_SM2_Mensual$seasonal
+# autoplot(tsSM2_Mensual_Adjusted)
+```
+
+
+
+
+```{r}
+tsSM2_Semanal_detrended <- tsSM2_Semanal - Componentes_SM2_SemanalSTL$time.series[,2]
+plot.ts(tsSM2_Semanal_detrended, 
+        ylab = "Energía (Vatios-hora)", 
+        main = 'Seasonal variability of energy comsumption',
+        cex.main = 0.85)
+```
+
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(Componentes_SM2_SemanalSTL$time.series[,3], 
+     col = "blue", main = 'Remainder', ylab = "")
+qqnorm(Componentes_SM2_SemanalSTL$time.series[,3])
+qqline(Componentes_SM2_SemanalSTL$time.series[,3])
+```
+
+
+```{r}
+shapiro.test(Componentes_SM2_SemanalSTL$time.series[,3])
+```
+
+Los resíduos no siguen una distribución normal. La descomposición no es buena.
+
+
+
+
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(stl(tsSM2_Semanal_detrended ,s.window = "periodic",robust = TRUE))
+```
+
+La componente estacional se mueve en un rango de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM2_HW_Semanal <- HoltWinters(tsSM2_Semanal_detrended ,
+                                # tsSM2_Mensual_Adjusted,
+                                beta=TRUE, gamma=TRUE)
+plot(tsSM2_HW_Semanal,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 7 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+     tsSM2_HW_Semanal_for <- forecast(tsSM2_HW_Semanal, h=53)
+plot(tsSM2_HW_Semanal_for , ylab= "Vatios-Hora", xlab="Fecha - Lavadero",
+     main="Predicción semanal del consumo energético del lavadero \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM2_HW_Semanal_forC <- forecast(tsSM2_HW_Semanal, h=53, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM2_HW_Semanal_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción semanal para el año 2010", start(2010))
+```
+
+
+
+
+##### AC y termo eléctrico
+
+```{r}
+# ## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
+# tsSM3_Mensual_Adjusted <- tsSM3_Mensual - Componentes_SM3_Mensual$seasonal
+# autoplot(tsSM3_Mensual_Adjusted)
+```
+
+
+
+```{r}
+tsSM3_Semanal_detrended <- tsSM3_Semanal - Componentes_SM3_SemanalSTL$time.series[,2]
+plot.ts(tsSM3_Semanal_detrended, 
+        ylab = "Energía (Vatios-hora)", 
+        main = 'Seasonal variability of energy comsumption',
+        cex.main = 0.85)
+```
+
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(Componentes_SM3_SemanalSTL$time.series[,3], 
+     col = "blue", main = 'Remainder', ylab = "")
+qqnorm(Componentes_SM3_SemanalSTL$time.series[,3])
+qqline(Componentes_SM3_SemanalSTL$time.series[,3])
+```
+
+
+```{r}
+shapiro.test(Componentes_SM3_SemanalSTL$time.series[,3])
+```
+
+Los resíduos no siguen una distribución normal. La descomposición no es buena.
+
+
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(stl(tsSM3_Semanal_detrended ,s.window = "periodic",robust = TRUE))
+```
+
+La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM3_HW_Semanal <- HoltWinters(tsSM3_Semanal_detrended ,
+                              # tsSM3_Mensual_Adjusted,
+                                beta=TRUE, gamma=TRUE)
+plot(tsSM3_HW_Semanal,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM3_HW_Semanal_for <- forecast(tsSM3_HW_Semanal, h=53)
+plot(tsSM3_HW_Semanal_for , ylab= "Vatios-Hora", xlab="Fecha - Lavadero",
+     main="Predicción del consumo energético semanal del AC y termo eléctrico \n Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM3_HW_Semanal_forC <- forecast(tsSM3_HW_Semanal, h=53, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM3_HW_Semanal_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción semanal del consumo energético para el año 2010", start(2010))
+```
+
+
+
+
+
+
+##### Comparación de los coeficientes y resultados de cada predicción. Datos sin estacionalidad
+
+
+En las gráficas de predicción, hemos observado que el ajuste no mantiene la tendencia de consumo energético de la serie.
+
+
+```{r}
+RMSE_SM1_GranSemanalFor<-accuracy(tsSM1_HW_Semanal_forC   ,DatosRealesSeriesSemanales$Sub_metering_1)[4]
+RMSE_SM2_GranSemanalFor<-accuracy(tsSM2_HW_Semanal_forC   ,DatosRealesSeriesSemanales$Sub_metering_2)[4]
+RMSE_SM3_GranSemanalFor<-accuracy(tsSM3_HW_Semanal_forC   ,DatosRealesSeriesSemanales$Sub_metering_3)[4]
+
+
+ResEvolSemanal2_SinEstacionalidadConTendencia <-
+cbind.data.frame(
+      Submedidor=c("Cocina","Lavadero","AC y TermoE"),
+      RMSE = c(RMSE_SM1_GranSemanalFor,
+               RMSE_SM2_GranSemanalFor,
+               RMSE_SM3_GranSemanalFor)
+)
+ResEvolSemanal2_SinEstacionalidadConTendencia %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+```
+
+
+
+
+
+
+
+
+
+#### Evolución mensual del consumo (con estacionalidad). Años 2007-2009
+
+Vamos a ver una predicción del consumo enegético de cada submedidor con el método de HW. En este caso, no eliminaremos la estacionalidad, para ver así si se mantiene la tendencia de consumo.
+
+##### Cocina
+
+
+
+```{r}
+tsSM1_Mensual_AdjustedII <- tsSM1_Mensual # - Componentes_SM1_Mensual$seasonal
+autoplot(tsSM1_Mensual_AdjustedII)
+```
+
+Parece un muelle.
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(decompose(tsSM1_Mensual_AdjustedII))
+```
+
+La componente estacional se mueve en un rango de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM1_HW_MensualII <- HoltWinters(tsSM1_Mensual_AdjustedII, beta=TRUE, gamma=TRUE)
+# optimiza
+plot(tsSM1_HW_MensualII,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM1_HW_Mensual_forII <- forecast(tsSM1_HW_MensualII, h=12)
+plot(tsSM1_HW_Mensual_forII , ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico",
+     main="Predicción del consumo energético de la cocina \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM1_HW_Mensual_forCII <- forecast(tsSM1_HW_MensualII, h=53, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM1_HW_Mensual_forCII, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+```
+
+
+
+
+
+
+
+
+
+
+##### Lavadero
+
+```{r}
+## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
+tsSM2_Mensual_AdjustedII <- tsSM2_Mensual ## - Componentes_SM2_Mensual$seasonal
+autoplot(tsSM2_Mensual_AdjustedII)
+```
+
+No arece un muelle.
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(decompose(tsSM2_Mensual_AdjustedII)) 
+```
+
+TENDENCIA CLARAMENTE DECRECIENTE. Tambien observamos esacionalidad
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM2_HW_MensualII <- HoltWinters(tsSM2_Mensual_AdjustedII, beta=TRUE, gamma=TRUE)
+plot(tsSM2_HW_MensualII,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM2_HW_Mensual_forII <- forecast(tsSM2_HW_MensualII, h=53)
+plot(tsSM2_HW_Mensual_forII , ylab= "Vatios-Hora", xlab="Fecha - Lavadero",
+     main="Predicción del consumo energético del lavadero \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM2_HW_Mensual_forCII <- forecast(tsSM2_HW_MensualII, h=53, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM2_HW_Mensual_forCII, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##### AC y termo eléctrico
+
+```{r}
+## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
+tsSM3_Mensual_AdjustedII <- tsSM3_Mensual # - Componentes_SM3_Mensual$seasonal
+autoplot(tsSM3_Mensual_AdjustedII)
+```
+
+No parece un muelle.
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(decompose(tsSM3_Mensual_AdjustedII))
+```
+
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM3_HW_MensualII <- HoltWinters(tsSM3_Mensual_AdjustedII, beta=TRUE, gamma=TRUE)
+plot(tsSM3_HW_MensualII,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM3_HW_Mensual_forII <- forecast(tsSM3_HW_MensualII, h=53)
+plot(tsSM3_HW_Mensual_forII , ylab= "Vatios-Hora", xlab="Fecha - Lavadero",
+     main="Predicción del consumo energético del AC y termo eléctrico \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM3_HW_Mensual_forCII <- forecast(tsSM3_HW_MensualII, h=53, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM3_HW_Mensual_forCII, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+```
+
+
+
+
+
+
+##### Comparación de los coeficientes y resultados de cada predicción. Datos con estacionalidad
+
+
+```{r}
+RMSE_SM1_GranMensualForII<-accuracy(tsSM1_HW_Mensual_forCII   ,DatosRealesSeriesMensuales$Sub_metering_1)[4]
+RMSE_SM2_GranMensualForII<-accuracy(tsSM2_HW_Mensual_forCII   ,DatosRealesSeriesMensuales$Sub_metering_2)[4]
+RMSE_SM3_GranMensualForII<-accuracy(tsSM3_HW_Mensual_forCII   ,DatosRealesSeriesMensuales$Sub_metering_3)[4]
+
+
+ResEvolMensual2SinTendenciaConEstacionalidad<-
+cbind.data.frame(
+      Submedidor=c("Cocina","Lavadero","AC y TermoE"),
+      RMSE = c(RMSE_SM1_GranMensualForII,
+               RMSE_SM2_GranMensualForII,
+               RMSE_SM3_GranMensualForII)
+   
+    
+)
+
+ResEvolMensual2SinTendenciaConEstacionalidad %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+```
+
+
+
+
+
+#### Comparación de resultados. Predicción antes y despues de eliminar estacionalidad
+
+
+```{r}
+Comparacion<-cbind.data.frame(
+  ResEvolMensual2_SinEstacionalidadConTendencia,
+  ResEvolMensual2SinTendenciaConEstacionalidad[,2])
+
+colnames(Comparacion) <- c("Submedidor","RMSE Con Estacionalidad","RMSE Sin estacionalidad")
+Comparacion %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+```
+
+
+Resultados más fiables y con menor error trás haber eliminado la estacionalidad de la serie. También así podemos ver la tendencia.
+
+
+```{r}
+#p1<-autoplot(tsSM1_Mensual_Adjusted)
+#p2<-autoplot(tsSM1_Mensual_AdjustedII)
+#grid.arrange(
+#             grobs = list(p1,p2),
+#           nrow = 2,
+#             top="Sin estacionalidad",bottom="Con estacionalidad"
+#             )
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Evolución diaria del consumo por meses. Mes de Enero
+
+## Serie temporal y visualización
+
+En este caso, crearemos una serie para cada mes, ya que la frecuencia de los datos no será la misma, al tener cada mes un número de días diferente.
+
+
+
+
+```{r}
+par(mfrow=c(2,2))
+seriesDiariasEnero <- Granularidad_dias %>% filter(year != 2006 & year != 2010 & month == 1)
+## Creamos un objeto TS
+   tsSM1_DiariaEnero<- ts(seriesDiariasEnero$Sub_metering_1, frequency=31, start=c(2007,1))
+   
+   tsSM2_DiariaEnero<- ts(seriesDiariasEnero$Sub_metering_2, frequency=31, start=c(2007,1))
+   
+   tsSM3_DiariaEnero<- ts(seriesDiariasEnero$Sub_metering_3, frequency=31, start=c(2007,1))
+   
+tsSM_GAP_DiariaEnero<- ts(seriesDiariasEnero$Global_active_power, frequency=31, start=c(2007,1))
+```
+
+```{r}
+## Plot sub-meter 3 with autoplot - add labels, color
+autoplot(tsSM1_DiariaEnero, ts.colour = 'red', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía de la cocina en el mes de Enero \n Años 2007-2009")
+autoplot(tsSM2_DiariaEnero, xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía de la lavandería en el mes de Enero \n Años 2007-2009")
+autoplot(tsSM3_DiariaEnero, ts.colour = 'blue', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía del aire acondicionado y termo eléctrico en el mes de Enero \n Años 2007-2009")
+autoplot(tsSM_GAP_DiariaEnero, ts.colour = 'green', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía en el mes de Enero \n Años 2007-2009")
+```
+
+Parece que no existen muchos patrones que nos podrían ayudar a hacer predicciones, no serían muy fiables. (gráfica muelle)
+
+
+
+
+
+
+
+
+
+
+## Predicción del año 2010 antes de descomponer la serie
+
+
+Vamos a plicar regresión lineal a cada serie temporal, y veremos el valor de $R^2$ y del error cuadrático medio.
+
+
+
+### SM1. Cocina
+
+#### Modelo
+
+```{r}
+fitSM1_DiariaEnero <- tslm(tsSM1_DiariaEnero ~ trend + season) 
+summary(fitSM1_DiariaEnero)
+```
+
+Resultados:
+
+- Valor del coeficiente de determinación: 0.2234. Es un valor muy bajo, el modelo únicamente explica el 22% de la variabilidad total.
+
+- Hay un coeficiente significativamente no nulo.
+
+#### Predicción IC
+
+Predicción para el mes de Enero de 2010
+
+```{r}
+forecastfitSM1_DiariaEnero <- forecast(fitSM1_DiariaEnero, h=31, level=c(80,90))
+## h=12 para predecir el año 2010
+## Plot sub-meter 3 forecast, limit y and add labels
+plot(forecastfitSM1_DiariaEnero, ylab= "Watt-Hours", xlab="Fecha",
+     main="Predicción del consumo energético de Enero del año 2010 \n  a través de un modelo de regresión")
+```
+
+
+
+
+
+
+
+
+### SM2. Lavadero
+
+#### Modelo
+
+```{r}
+fitSM2_DiariaEnero <- tslm(tsSM2_DiariaEnero ~ trend + season) 
+summary(fitSM2_DiariaEnero)
+```
+
+Resultados:
+
+- Valor del coeficiente de determinación: 0.2859. Es un valor bajo, el modelo únicamente explica el 29% de la variabilidad total.
+
+- Hay tres coeficientes significativamente no nulos.
+
+#### Predicción IC
+
+Predicción para los próximos 12 meses (año 2010) 
+
+```{r}
+forecastfitSM2_DiariaEnero <- forecast(fitSM2_DiariaEnero, h=31, level=c(80,90))
+## h=12 para predecir el año 2010
+## Plot sub-meter 3 forecast, limit y and add labels
+plot(forecastfitSM2_DiariaEnero, ylab= "Watt-Hours", xlab="Fecha",
+     main="Predicción del consumo energético del año 2010 \n  a través de un modelo de regresión")
+```
+
+
+
+
+
+
+### SM3. AC y termo
+#### Modelo
+
+```{r}
+fitSM3_DiariaEnero <- tslm(tsSM3_DiariaEnero~ trend + season) 
+summary(fitSM3_DiariaEnero)
+```
+
+Resultados:
+
+- Valor del coeficiente de determinación:0.3269. Es un valor que es muy bajo, el modelo únicamente explica el 32% de la variabilidad total.
+
+- Hay tres coeficientes significativamente no nulos.
+
+#### Predicción IC
+
+Predicción para los próximos 12 meses (año 2010) 
+
+```{r}
+forecastfitSM3_DiariaEnero <- forecast(fitSM3_DiariaEnero, h=31, level=c(80,90))
+## h=12 para predecir el año 2010
+## Plot sub-meter 3 forecast, limit y and add labels
+plot(forecastfitSM3_DiariaEnero, ylab= "Watt-Hours", xlab="Fecha",
+     main="Predicción del consumo energético del mes de Enero del año 2010 \n  a través de un modelo de regresión")
+```
+
+
+Se prevee una bajada del consumo
+
+
+
+
+
+
+
+### Comparación de los coeficientes y resultados de cada modelo
+
+
+
+```{r}
+DatosRealesSeriesEnero<- Granularidad_meses %>% filter(year == 2010 )
+
+RMSE_SM1_GranMensualEnero<-accuracy(forecastfitSM1_DiariaEnero  ,DatosRealesSeriesEnero$Sub_metering_1)[4]
+R2_SM1_GranMensualEnero<-0.5796
+
+
+RMSE_SM2_GranMensualEnero<-accuracy(forecastfitSM2_DiariaEnero   ,DatosRealesSeriesEnero$Sub_metering_2)[4]
+R2_SM2_GranMensualEnero<-0.6541
+
+
+
+RMSE_SM3_GranMensualEnero<-
+  accuracy(
+    forecastfitSM3_DiariaEnero ,DatosRealesSeriesEnero$Sub_metering_3)[4]
+R2_SM3_GranMensualEnero<-0.7577
+
+ResEvolMensualEnero<-
+cbind.data.frame(
+      Submedidor=c("Cocina","Lavadero","AC y TermoE"),
+      RMSE = c(RMSE_SM1_GranMensualEnero,
+               RMSE_SM2_GranMensualEnero,
+               RMSE_SM3_GranMensualEnero),
+     # MASE = c(MASE_SM1_GranMensual,MASE_SM2_GranMensual,MASE_SM3_GranMensual),
+      R2 = c(R2_SM1_GranMensualEnero,
+             R2_SM2_GranMensualEnero,
+             R2_SM3_GranMensualEnero)
+)
+
+ResEvolMensualEnero %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+
+
+# MASE: Mean absolute error
+# RMSE: root mean scuare error. Diferencia entre los valores predichos y los observados.
+
+```
+
+
+El RMSE del modelo con mejor coeficiente de determinación es el más alto. Pero no hay que olvidar que el consumo eléctrico para el submedidor correspondiente al AC y termo eléctrico es el que más energía consume de todos con una diferencia muy grande.
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Forecasting descomponiendo la serie (así ok)
+
+Descomponer: quitar tendencia
+
+### Descomposición de la serie y visualización
+
+#### Submetering 1
+
+Se aprecia componente estacional: oscilacione que se repiten cada año.
+La componente tendencia tambien se aprecia. Tendencia decreciente.
+
+```{r}
+ tsSM1_DiariaEnero %>%
+  stl( #t.window=13,
+      s.window="periodic", 
+      robust=TRUE)  %>% summary()
+```
+Remainder no es un muelle. Observamos tendencia creciente y fuerte componente estacional
+
+
+```{r}
+Componentes_SM1_DiariaEneroSTL<-
+  tsSM1_DiariaEnero %>%stl( #t.window=13,
+  s.window="periodic",  robust=TRUE)
+autoplot(Componentes_SM1_DiariaEneroSTL, ts.colour = 'blue')
+plot.ts(tsSM1_Mensual, col = 'gray')
+lines(Componentes_SM1_DiariaEneroSTL$time.series[,2], 
+      col = "red", lwd = 1, lty = 2)
+```
+
+
+
+#### Submetering 2
+
+
+```{r}
+ tsSM2_DiariaEnero %>%
+  stl( #t.window=13,
+      s.window="periodic", 
+      robust=TRUE) %>% summary()
+```
+
+
+```{r}
+Componentes_SM2_DiariaEneroSTL<- tsSM2_DiariaEnero %>%stl( #t.window=13,
+  s.window="periodic",  robust=TRUE)
+autoplot(Componentes_SM2_DiariaEneroSTL, ts.colour = 'blue')
+plot.ts(tsSM2_DiariaEnero, col = 'gray')
+lines(Componentes_SM2_DiariaEneroSTL$time.series[,2], 
+      col = "red", lwd = 1, lty = 2)
+```
+
+
+
+
+
+
+#### Submetering 3
+
+```{r}
+## Descomponer la serie
+Componentes_SM3_DiariaEnero <- decompose(tsSM3_DiariaEnero)
+## Plot
+plot(Componentes_SM3_DiariaEnero)
+## Check summary statistics for decomposed sub-meter 2
+summary(Componentes_SM3_DiariaEnero)
+```
+
+
+Se aprecia componente estacional: oscilacione que se repiten cada año.
+La componente tendencia tambien se aprecia. Tendencia creciente
+
+
+```{r}
+tsSM3_DiariaEnero %>%
+  stl( #t.window=13,
+      s.window="periodic", 
+      robust=TRUE)  %>% summary()
+```
+
+
+
+
+```{r}
+Componentes_SM3_DiariaEneroSTL<- tsSM3_DiariaEnero %>%stl( #t.window=13,
+  s.window="periodic",  robust=TRUE)
+autoplot(Componentes_SM3_DiariaEneroSTL, ts.colour = 'blue')
+plot.ts(tsSM3_DiariaEnero, col = 'gray')
+lines(Componentes_SM3_DiariaEnero$time.series[,2], 
+      col = "red", lwd = 1, lty = 2)
+```
+
+
+
+
+### Predicción con Holt-Winters (suavizado exponencial) para el año 2010
+
+Sin estacionalidad 
+
+Sería interesante verlo también con estacionalidad, para ver si se mantiene o no la tendencia.
+
+Tendencia de predicción (crecimiento o decrecimiento del consumo) y predicción teniendo en cuenta las componentes
+
+#### Evolución mensual del consumo (sin estacionalidad). Años 2007-2009
+
+##### Cocina
+
+
+
+
+```{r}
+tsSM1_DiariaEnero_detrended <- tsSM1_DiariaEnero - Componentes_SM1_DiariaEneroSTL$time.series[,2]
+plot.ts(tsSM1_DiariaEnero_detrended, 
+        ylab = "Energía (Vatios-hora)", 
+        main = 'Seasonal variability of energy comsumption',
+        cex.main = 0.85)
+```
+
+
+
+```{r}
+par(mfrow = c(1,2))
+  plot(Componentes_SM1_DiariaEneroSTL$time.series[,3], col = "blue", main = 'Remainder', ylab = "")
+qqnorm(Componentes_SM1_DiariaEneroSTL$time.series[,3])
+qqline(Componentes_SM1_DiariaEneroSTL$time.series[,3])
+```
+
+
+```{r}
+shapiro.test(Componentes_SM1_DiariaEneroSTL$time.series[,3])
+```
+
+Los resíduos no son solo ruido. Aún hay estacionalidad
+
+Volvemos a descomponer la serie desestacionalizada una vez.
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(stl(tsSM1_DiariaEnero_detrended ,s.window = "periodic",robust = TRUE))
+```
+
+La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+
+
+
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM1_HW_DiariaEnero<- HoltWinters(tsSM1_DiariaEnero_detrended ,
+                              #  tsSM1_Mensual_Adjusted, 
+  beta=TRUE, gamma=TRUE)
+# optimiza
+plot(tsSM1_HW_DiariaEnero,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM1_HW_DiariaEnero_for <- forecast(tsSM1_HW_DiariaEnero, h=31)
+plot(tsSM1_HW_DiariaEnero_for , ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico",
+     main="Predicción del consumo energético de la cocina \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM1_HW_DiariaEnero_forC <- forecast(tsSM1_HW_DiariaEnero, h=31, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM1_HW_DiariaEnero_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+```
+
+
+
+
+
+
+
+
+
+##### Lavadero
+
+
+
+
+```{r}
+tsSM2_DiariaEnero_detrended <- tsSM2_DiariaEnero - Componentes_SM2_DiariaEneroSTL$time.series[,2]
+plot.ts(tsSM2_DiariaEnero_detrended, 
+        ylab = "Energía (Vatios-hora)", 
+        main = 'Seasonal variability of energy comsumption',
+        cex.main = 0.85)
+```
+
+
+
+```{r}
+par(mfrow = c(1,2))
+  plot(Componentes_SM2_DiariaEneroSTL$time.series[,3], col = "blue", main = 'Remainder', ylab = "")
+qqnorm(Componentes_SM2_DiariaEneroSTL$time.series[,3])
+qqline(Componentes_SM2_DiariaEneroSTL$time.series[,3])
+```
+
+
+```{r}
+shapiro.test(Componentes_SM2_DiariaEneroSTL$time.series[,3])
+```
+
+Los resíduos no siguen una distribución normal. La descomposición no es buena.
+
+
+
+
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(stl(tsSM2_DiariaEnero_detrended ,s.window = "periodic",robust = TRUE))
+```
+
+La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM2_HW_DiariaEnero <- HoltWinters(tsSM2_DiariaEnero_detrended ,
+                                # tsSM2_Mensual_Adjusted,
+                                beta=TRUE, gamma=TRUE)
+plot(tsSM2_HW_DiariaEnero,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM2_HW_DiariaEnero_for <- forecast(tsSM2_HW_DiariaEnero, h=31)
+plot(tsSM2_HW_DiariaEnero_for , ylab= "Vatios-Hora", xlab="Fecha - Lavadero",
+     main="Predicción del consumo energético del lavadero \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM2_HW_DiariaEnero_forC <- forecast(tsSM2_HW_DiariaEnero, h=31, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM2_HW_DiariaEnero_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+```
+
+
+
+
+##### AC y termo eléctrico
+
+
+```{r}
+tsSM3_DiariaEnero_detrended <- tsSM3_DiariaEnero - Componentes_SM3_DiariaEneroSTL$time.series[,2]
+plot.ts(tsSM3_DiariaEnero_detrended, 
+        ylab = "Energía (Vatios-hora)", 
+        main = 'Seasonal variability of energy comsumption',
+        cex.main = 0.85)
+```
+
+
+
+```{r}
+par(mfrow = c(1,2))
+  plot(Componentes_SM3_DiariaEneroSTL$time.series[,3], col = "blue", main = 'Remainder', ylab = "")
+qqnorm(Componentes_SM3_DiariaEneroSTL$time.series[,3])
+qqline(Componentes_SM3_DiariaEneroSTL$time.series[,3])
+```
+
+
+```{r}
+shapiro.test(Componentes_SM3_DiariaEneroSTL$time.series[,3])
+```
+
+Los resíduos no siguen una distribución normal. La descomposición no es buena.
+
+
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(stl(tsSM3_DiariaEnero_detrended ,s.window = "periodic",robust = TRUE))
+```
+
+La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM3_HW_DiariaEnero <- HoltWinters(tsSM3_DiariaEnero_detrended ,
+                              # tsSM3_Mensual_Adjusted,
+                                beta=TRUE, gamma=TRUE)
+plot(tsSM3_HW_DiariaEnero,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM3_HW_DiariaEnero_for <- forecast(tsSM3_HW_DiariaEnero, h=31)
+plot(tsSM3_HW_DiariaEnero_for , ylab= "Vatios-Hora", xlab="Fecha - Lavadero",
+     main="Predicción del consumo energético del AC y termo eléctrico \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM3_HW_DiariaEnero_forC <- forecast( object = tsSM3_HW_DiariaEnero_for, h=31)
+## Plot only the forecasted area
+plot(tsSM3_HW_DiariaEnero_forC, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+```
+
+
+
+
+
+
+##### Comparación de los coeficientes y resultados de cada predicción. Datos sin estacionalidad
+
+
+En las gráficas de predicción, hemos observado que el ajuste no mantiene la tendencia de consumo energético de la serie.
+
+
+```{r}
+
+# RMSE_SM1_GranDiariaEneroFor<-accuracy(tsSM1_HW_DiariaEnero_forC   # ,seriesDiariasEnero$Sub_metering_1)[4]
+# RMSE_SM2_GranDiariaEneroFor<-accuracy(tsSM2_HW_DiariaEnero_forC   # ,seriesDiariasEnero$Sub_metering_2)[4]
+# RMSE_SM3_GranDiariaEneroFor<-accuracy(tsSM3_HW_DiariaEnero_forC   # ,seriesDiariasEnero$Sub_metering_3)[4]
+# 
+# 
+# ResEvolDiariaEnero2_SinEstacionalidadConTendencia <-
+# cbind.data.frame(
+#       Submedidor=c("Cocina","Lavadero","AC y TermoE"),
+#       RMSE = c(RMSE_SM1_GranDiariaEneroFor,
+#                RMSE_SM2_GranDiariaEneroFor,
+#                RMSE_SM3_GranDiariaEneroFor)
+# )
+# ResEvolDiariaEnero2_SinEstacionalidadConTendencia %>% kable(booktabs=TRUE) %>% # kable_styling(latex_options = "striped")
+```
+
+
+
+
+
+
+
+
+
+#### Evolución mensual del consumo (con estacionalidad). Años 2007-2009
+
+Vamos a ver una predicción del consumo enegético de cada submedidor con el método de HW. En este caso, no eliminaremos la estacionalidad, para ver así si se mantiene la tendencia de consumo.
+
+##### Cocina
+
+
+
+```{r}
+
+tsSM1_DiariaEnero_AdjustedII <- tsSM1_DiariaEnero # - Componentes_SM1_Mensual$seasonal
+autoplot(tsSM1_DiariaEnero_AdjustedII)
+```
+
+Parece un muelle.
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(decompose(tsSM1_DiariaEnero_AdjustedII))
+```
+
+La componente estacional se mueve en un rango de $10^{-11}$, podemos asumir que se ha eliminado esta componente.
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM1_HW_DiariaEneroII <- HoltWinters(tsSM1_DiariaEnero_AdjustedII, beta=TRUE, gamma=TRUE)
+# optimiza
+plot(tsSM1_HW_DiariaEneroII,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM1_HW_DiariaEnero_forII <- forecast(tsSM1_HW_DiariaEneroII, h=31)
+plot(tsSM1_HW_DiariaEnero_forII , ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico",
+     main="Predicción del consumo energético de la cocina \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM1_HW_DiariaEnero_forCII <- forecast(tsSM1_HW_DiariaEneroII, h=31, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM1_HW_DiariaEnero_forCII, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+```
+
+
+
+
+
+
+
+
+
+
+##### Lavadero
+
+```{r}
+## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
+tsSM2_DiariaEnero_AdjustedII <- tsSM2_DiariaEnero ## - Componentes_SM2_Mensual$seasonal
+autoplot(tsSM2_DiariaEnero_AdjustedII)
+```
+
+No arece un muelle.
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(decompose(tsSM2_DiariaEnero_AdjustedII)) 
+```
+
+TENDENCIA CLARAMENTE DECRECIENTE. Tambien observamos esacionalidad
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM2_HW_DiariaEneroII <- HoltWinters(tsSM2_DiariaEnero_AdjustedII, beta=TRUE, gamma=TRUE)
+plot(tsSM2_HW_DiariaEneroII,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+tsSM2_HW_DiariaEnero_forII <- forecast(tsSM2_HW_DiariaEneroII, h=31)
+plot(tsSM2_HW_DiariaEnero_forII , ylab= "Vatios-Hora", xlab="Fecha - Lavadero",
+     main="Predicción del consumo energético del lavadero \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+tsSM2_HW_DiariaEnero_forCII <- forecast(tsSM2_HW_DiariaEneroII, h=31, level=c(10,25))
+## Plot only the forecasted area
+plot(tsSM2_HW_DiariaEnero_forCII, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##### AC y termo eléctrico
+
+```{r}
+## Seasonal adjusting sub-meter 3 by subtracting the seasonal component & plot
+tsSM3_DiariaEnero_AdjustedII <- tsSM3_DiariaEnero # - Componentes_SM3_Mensual$seasonal
+autoplot(tsSM3_DiariaEnero_AdjustedII)
+```
+
+No parece un muelle.
+
+
+```{r}
+## Volvemos a descomponer la serie
+plot(decompose(tsSM3_DiariaEnero_AdjustedII))
+```
+
+
+
+###### Suavizado exponencial de HoltWinters
+
+
+
+```{r}
+## Holt Winters Exponential Smoothing & Plot
+tsSM3_HW_DiariaEneroII <- HoltWinters(tsSM3_DiariaEnero_AdjustedII, beta=TRUE, gamma=TRUE)
+plot(tsSM3_HW_DiariaEneroII,
+     xlab="Fecha",
+     ylab="Valores observados y ajustados",
+     main="Suavizado exponencial de Holt-Winters")
+```
+
+
+
+###### Pronóstico de HoltWinters para el año 2010
+
+Vamos a predecir las próximas 12 observaciones.
+
+```{r}
+## HoltWinters forecast & plot
+     tsSM3_HW_DiariaEnero_forII <- forecast(tsSM3_HW_DiariaEneroII, h=31)
+plot(tsSM3_HW_DiariaEnero_forII , ylab= "Vatios-Hora", xlab="Fecha - Lavadero",
+     main="Predicción del consumo energético del AC y termo eléctrico \ Año 2010" ) 
+```
+
+
+
+```{r}
+## Forecast HoltWinters with diminished confidence levels
+     tsSM3_HW_DiariaEnero_forCII <- forecast(tsSM3_HW_DiariaEneroII, h=31, level=c(10,25))
+plot(tsSM3_HW_DiariaEnero_forCII, ylab= "Vatios-Hora", xlab="Fecha - AireAcondicionado y termo eléctrico", main="Predicción para el año 2010", start(2010))
+```
+
+
+
+
+
+
+##### Comparación de los coeficientes y resultados de cada predicción. Datos con estacionalidad
+
+
+```{r}
+# RMSE_SM1_GranDiariaEneroForII<-accuracy(tsSM1_HW_DiariaEnero_forCII   # ,seriesDiariasEnero$Sub_metering_1)[4]
+# RMSE_SM2_GranDiariaEneroForII<-accuracy(tsSM2_HW_DiariaEnero_forCII   # ,seriesDiariasEnero$Sub_metering_2)[4]
+# RMSE_SM3_GranDiariaEneroForII<-accuracy(tsSM3_HW_DiariaEnero_forCII   # ,seriesDiariasEnero$Sub_metering_3)[4]
+# 
+# 
+# ResEvolDiariaEnero2SinTendenciaConEstacionalidad<-
+# cbind.data.frame(
+#       Submedidor=c("Cocina","Lavadero","AC y TermoE"),
+#       RMSE = c(RMSE_SM1_GranDiariaEneroForII,
+#                RMSE_SM2_GranDiariaEneroForII,
+#                RMSE_SM3_GranDiariaEneroForII)
+#    
+#     
+# )
+# 
+# ResEvolDiariaEnero2SinTendenciaConEstacionalidad %>% kable(booktabs=TRUE) %>% # kable_styling(latex_options = "striped")
+```
+
+
+
+
+
+#### Comparación de resultados. Predicción antes y despues de eliminar estacionalidad
+
+
+```{r}
+# Comparacion<-cbind.data.frame(
+#   ResEvolDiariaEnero2_SinEstacionalidadConTendencia,
+#   ResEvolDiariaEnero2SinTendenciaConEstacionalidad[,2])
+# 
+# colnames(Comparacion) <- c("Submedidor","RMSE Con Estacionalidad","RMSE Sin estacionalidad")
+# Comparacion %>% kable(booktabs=TRUE) %>% kable_styling(latex_options = "striped")
+```
+
+
+Resultados más fiables y con menor error trás haber eliminado la estacionalidad de la serie. También así podemos ver la tendencia.
+
+
+```{r}
+#p1<-autoplot(tsSM1_Mensual_Adjusted)
+#p2<-autoplot(tsSM1_Mensual_AdjustedII)
+#grid.arrange(
+#             grobs = list(p1,p2),
+#           nrow = 2,
+#             top="Sin estacionalidad",bottom="Con estacionalidad"
+#             )
+```
+
+
+
+```{r}
+library(dplyr)
+a<-as.data.frame(Granularidad_dias %>% select("energia2","Date") %>% filter(Date > "2008-12-16") )
+
+library(plotly)
+
+ plot_ly(x=~a$Date,
+            y = ~a[,3],
+            type = 'scatter',mode = 'lines',name="Plot",
+            line=list(color='rgb(199, 0, 57 )'),marker = list(color =   'rgb(199, 0, 57  )')
+    )
+
+```
+
+
+
+```{r}
+library(tidyr)
+DatosRango<-Granularidad_dias%>%
+  pivot_longer(cols = c(7,8,9,10,11),
+               names_to = "Energia",
+values_to = "valorEnergetico") %>% 
+  select(
+  Date , Energia , valorEnergetico
+)
+
+# DatosRango %>% filter(Energia == "Sub_metering_1", Date > "2008-12-12")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

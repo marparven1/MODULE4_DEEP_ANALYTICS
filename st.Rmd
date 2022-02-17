@@ -166,13 +166,6 @@ seriesSemanales <- rbind.data.frame(
    filter(Granularidad_semanas, year== 2009  )
 )
 
-
-
-
-
-
-
-
 ## Creamos un objeto TS
    tsSM1_Semanal<- ts(seriesSemanales$Sub_metering_1,         frequency=7, start=c(2007,1))
    tsSM2_Semanal<- ts(seriesSemanales$Sub_metering_2,         frequency=7, start=c(2007,1))
