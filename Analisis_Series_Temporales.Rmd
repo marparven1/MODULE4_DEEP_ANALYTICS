@@ -469,9 +469,9 @@ La componente estacional se mueve en un ranfo de $10^{-11}$, podemos asumir que 
 tsSM1_HW_Mensual <- HoltWinters(tsSM1_Mensual_detrended ,
 ## Holt Winters Exponential Smoothing & Plot
                               #  tsSM1_Mensual_Adjusted, 
-#  beta=TRUE, 
-#gamma=TRUE,
-alpha=TRUE
+  beta=TRUE, 
+ #  gamma=TRUE,
+  alpha=TRUE
 )
 
 # optimiza
@@ -482,37 +482,8 @@ plot(tsSM1_HW_Mensual,
 ```
 
 
-```{r}
-tsSM1_HW_Mensual <- HoltWinters(tsSM1_Mensual_detrended ,
-## Holt Winters Exponential Smoothing & Plot
-                              #  tsSM1_Mensual_Adjusted, 
-beta=TRUE, 
-gamma=TRUE,
-#alpha=TRUE
-)
 
-# optimiza
-plot(tsSM1_HW_Mensual,
-     xlab="Fecha",
-     ylab="Valores observados y ajustados",
-     main="Suavizado exponencial de Holt-Winters")
-```
 
-```{r}
-#tsSM1_HW_Mensual <- HoltWinters(tsSM1_Mensual_detrended ,
-### Holt Winters Exponential Smoothing & Plot
-#                              #  tsSM1_Mensual_Adjusted, 
-#  beta=TRUE, 
-#gamma=TRUE,
-#alpha=TRUE
-#)
-#
-## optimiza
-#plot(tsSM1_HW_Mensual,
-#     xlab="Fecha",
-#     ylab="Valores observados y ajustados",
-#     main="Suavizado exponencial de Holt-Winters")
-```
 
 
 ###### Pronóstico de HoltWinters para el año 2010

@@ -10,11 +10,9 @@ start working on problems that benefit from the application of machine learning 
 
 
 
-In this module, we will be working for an "Internet of Things" technology start-up that wants to use Data Analytics to solve two difficult problems in the physical
-world 
+In this module, we will be working for an "Internet of Things" technology start-up that wants to use Data Analytics to solve two difficult problems in the physical world. 
 
-Smart energy usage: Modeling patterns of energy usage by time of day and day of the year in a typical residence whose electrical system is monitored by multiple
-sub-meters.
+Smart energy usage: Modeling patterns of energy usage by time of day and day of the year in a typical residence whose electrical system is monitored by multiple sub-meters.
 Indoor locationing: Determining a person’s physical position in a multi-building indoor space using wifi fingerprinting.
 
 
