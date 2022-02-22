@@ -95,7 +95,7 @@ Es interesante resaltar como los submedidores 1 y 2, registran su máximo de con
 
 
 ```{r}
-DatosCompletos[which.min(DatosCompletos$energia2),-c(1:8)]
+# DatosCompletos[which.min(DatosCompletos$energia2),-c(1:8)]
 ```
 
 
@@ -389,12 +389,11 @@ graf07<-plot_ly(x=~Mensual07$`Date-MY`,type = 'scatter',
            line=list(color='rgb(150, 218, 108)'),
            marker = list(color ='rgb(150, 218, 108)')) %>%
  layout(title = "Evolución del consumo energético mensual. Año 2007",
-        legend = list(orientation = 'h'),
  xaxis = list(title = "2007",
               tickvals=list( "2007-01" , "2007-02"  , "2007-03" , "2007-04" , "2007-05"  , "2007-06", "2007-07" , "2007-08"  , "2007-09", "2007-10" , "2007-11"  , "2007-12" )
               ),
  yaxis = list (title = "Energía (Varios-hora)"))
-
+graf07
 
 Mensual08 <- Granularidad_meses %>% filter(year==2008)
 graf08<-plot_ly(x=~Mensual08$`Date-MY`, type = 'scatter',
@@ -411,13 +410,13 @@ graf08<-plot_ly(x=~Mensual08$`Date-MY`, type = 'scatter',
            ,
            line=list(color='rgb(150, 218, 108)'),
            marker = list(color ='rgb(150, 218, 108)')) %>%
- layout(title = "Año 2008",
+ layout(title = "Evolución del consumo energético mensual. Año 2008",
  xaxis = list(title = "2008",
               tickvals=list( "2008-01" , "2008-02"  , "2008-03" , "2008-04" , "2008-05"  , "2008-06", "2008-07" , "2008-08"  , "2008-09", "2008-10" , "2008-11"  , "2008-12" )
               ),
  yaxis = list (title = "Energía (Varios-hora)")
 )
-
+graf08
 
 
 
@@ -443,7 +442,7 @@ graf09<-plot_ly(x=~Mensual09$`Date-MY`,type = 'scatter',
                tickvals=list("2009-01" ,"2009-02"  ,"2009-03" ,"2009-04" ,"2009-05"  ,"2009-06","2009-07" ,"2009-08"  ,"2009-09","2009-10" ,"2009-11"  ,"2009-12" )
               ),
  yaxis = list (title = "Energía (Varios-hora)"))
-
+graf09
 
 
 Mensual10 <- Granularidad_meses %>% filter(year==2010)
@@ -455,36 +454,29 @@ graf10<-plot_ly(x=~Mensual10$`Date-MY`,type = 'scatter',
            marker = list(color =   'rgb(199, 0, 57  )')) %>% 
   
  add_trace(y = ~Mensual10$Sub_metering_2, name = 'Lavadero',
-           mode = 'lines+markers'
-           ,
+           mode = 'lines+markers',
            line=list(color='rgb(254, 237, 108)'),
            marker = list(color =   'rgb(243, 221, 63  )')) %>%
  add_trace(y = ~Mensual10$Sub_metering_3, name = 'Calefacción & AC', mode = 'lines+markers'
            ,
            line=list(color='rgb(150, 218, 108)'),
            marker = list(color ='rgb(150, 218, 108)')) %>%
- layout(
+  layout(title = "Evolución del consumo energético mensual. Año 2010",
  xaxis = list(title = "2010",
 ticktext = list("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"), 
-                          tickvals = list("2010-01", "2010-02", "2010-03", "2010-04", "2010-05", "2010-06", "2010-07", "2010-08", "2010-09", "2010-10", "2010-11", "2010-12")
-                          
-              )
- # yaxis = list (title = "Energía (Varios-hora)")
- )
+                          tickvals = list("2010-01", "2010-02", "2010-03", "2010-04", "2010-05", "2010-06", "2010-07", "2010-08", "2010-09", "2010-10", "2010-11", "2010-12")), yaxis = list (title = "Energía (Varios-hora)")
+)
 
-
-fig <- subplot(graf07, graf08, nrows = 1) %>%
-  layout( title = 'Evolución del consumo energético mensual, años 2007-2008'
-        )
-fig
-
-fig2 <- subplot(graf09, graf10, nrows = 1) %>%
-  layout( title = 'Evolución del consumo energético mensual, años 2009-2010'
-        )
-fig2
-
-
-
+ graf10
+# fig <- subplot(graf07, graf08, nrows = 1) %>%
+#   layout( title = 'Evolución del consumo energético mensual, años 2007-2008'
+#         )
+# fig
+# 
+# fig2 <- subplot(graf09, graf10, nrows = 1) %>%
+#   layout( title = 'Evolución del consumo energético mensual, años 2009-2010'
+#         )
+# fig2
 ```
 
 
@@ -855,6 +847,55 @@ Podemos observar que el porcentaje de consumo energético del termo eléctrico y
 Con respecto al lavadero, el consumo energético en verano también fue superior al de invierno.
 
 El consumo energético que ha registrado el submedidor de la cocina ha tenido el mismo comportamiento que el del aire y termo, es decir, el porcentaje de consumo fue superior en verano, salvo para el año 2010.
+
+
+
+
+
+
+
+
+
+# Conclusiones
+
+Los datos de consumo han sido los siguientes:
+
+Consumo energético medio por minuto (Vatios-hora):
+
+- Cocina (Submedidor 1): 1.11 Wh
+- Lavadero (Submedidor 2): 1.28 Wh
+- Aire acondicionado y termo eléctrico (Submedidor 3): 6.417 Wh
+- Energía global: 18.103 Wh
+- Resto de la casa: 9.287 Wh
+
+
+En primer lugar, es destacable que el medidor que más consumo de energía ha registrado es el que corresponde al aire acondicionado y termo eléctrico.
+
+El consumo enerético se ha visto incrementado en el último año 2009, en especial el del termo eléctrico y aire acondicionado, ya que el consumo energético cada día de la semana en el año 2009 ha sido superior al consumo medio para cada día de la semana en el período comprendido de Diciembre de 2006 a Diciembre de 2008.
+
+
+Observando el consumo energético mensual, podemos apreciar que para todos los años el consumo energético en el mes de agosto es muy inferior al resto de meses del año para todas las zonas submeterizadas. 
+
+Por el contrario, el mes de Diciembre es el mes en que se ha registrado un mayor consumo de energía, acentuandose más esto para el aire acondicionado y termo eléctrico. Sin embargo, este patrón no se verifica para el año 2010, ya que fué el mes de Enero de ese año el mes que registró un mayor consumo energético.
+
+
+Si observamos el consumo energético por horas, vemos que el consumo varía bastante, tomando como ejemplo el día 2 de Enero del año 2009:
+
+- Para el lavadero se ha registrado un mayor consumo energético entre las 0 y 12 horas, y posteriormente el consumo desciente, llegando a ser un 2.1% del consumo total en la franja horaria de 18-23 horas.
+
+- La cocina registra un consumo bastante inferior al resto y de hecho, de 0 a 12 no se registró consumo energético
+
+- Termo eléctrico y aire acondicionado: su uso en la franja horaria de 13 a 17 fué de más del 50% del total, pero sin embarco de 0-5 representó únicamente un 13% de la energía global
+
+## Recomendaciones
+
+Podría ser conveniente submeterizar otras zonas de la casa, como la televisión, el horno, microondas, placas de inducción, luz y resto de dispositivos electrónicos, ya que la energía consumida por el resto de la casa que no corresponde a la energía submeterizada es del 51%.
+
+También sería conveniente medir el consumo energético del aire acondicionado y termo eléctrico por separado, ya que son los dispositivos que han registrado un mayor consumo energético.
+
+
+
+
 
 
 
