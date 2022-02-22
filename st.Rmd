@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Plot POA
 
 
-Vamos a analizar la serie temporal del submedidor 3, aire acondicionado y termo eléctrico. Vamos a extraer 52 observaciones opr año, esto es igual a una observación diaria. Lunes a las 20h.
+Vamos a analizar la serie temporal del submedidor 3, aire acondicionado y termo eléctrico. Vamos a extraer 52 observaciones por año, esto es igual a una observación diaria. Lunes a las 20h.
 Años 2007, 2008 y 2009
 
 
@@ -121,9 +121,6 @@ autoplot(tsSM2_DiariaMarzo, xlab = "Día", ylab = "Energía (Varios-hora)", main
 autoplot(tsSM3_DiariaMarzo, ts.colour = 'blue', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía del aire acondicionado y termo eléctrico en el mes de Marzo \n Años 2007-2009")
 autoplot(tsSM_GAP_DiariaMarzo, ts.colour = 'green', xlab = "Día", ylab = "Energía (Varios-hora)", main = "Evolución diaria del consumo de energía en el mes de Marzo \n Años 2007-2009")
 ```
-
-
-
 
 
 
