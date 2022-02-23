@@ -11,6 +11,35 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 
+```{r librerias ,message=FALSE}
+library(dplyr)
+library(tidyverse)
+library(kableExtra)
+library(DT) # DataTables
+
+
+
+library(imputeTS) # Tratamiento de datos faltantes
+
+library(plotly)   # Gráficas
+library(ggplot2)  # Gráficas
+library(ggfortify)
+library(gridExtra)
+
+library(forecast) # Tratamiento de series temporales
+```
+
+
+
+```{r , cargaDatos}
+load(file="Datos/DF_Energia_GMinutos.RData")
+load(file="Datos/DF_Energia_GHoras.RData")
+load(file="Datos/DF_Energia_GDiaria.RData")
+load(file="Datos/DF_Energia_GMensual.RData")
+```
+
+
+
 
 ## Preparación para analizar los datos. Primera visualización
 
