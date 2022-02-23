@@ -107,6 +107,7 @@ Contenidos:
     - Resultados de las predicciones (error y coeficiente R2)
     - Pronóstico para nuevos datos
  - Análisis de la serie temporal con la metodología de Box-Jenkis
+  - Conclusiones
  
  Nota: este estudio se ha hecho para las siguientes granularidades:
  
@@ -114,6 +115,7 @@ Contenidos:
  - Evolución semanal del consumo
  - Evolución anual del consumo
  
+
  
      
 
